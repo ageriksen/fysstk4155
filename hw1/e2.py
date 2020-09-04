@@ -1,0 +1,60 @@
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+#solution imports below
+import pandas as pd
+from sklearn.model_selection import train_test_split
+#
+
+def split_data(data, target, test_ratio=0.2):
+    indices = np.random.permutation(data.shape[0])
+    test_set_size = int(data.shape[0]*test_ratio)
+    test_indices = indices[:test_set_size]
+    train_indices = indices[test_set_size:]
+    return data[train_indices], data[test_indices], target[train_indices], target[test_indices]
+
+def R2(y, y_tilde):
+    return 1 - np.sum( (y - y_tilde)**2 )/np.sum( (y - np.mean(y))**2 )
+
+def MSE(y, y_tilde):
+    n = np.size(y)
+    return np.sum( (y - y_tilde)**2 )/n
+
+#x = np.random.rand(100, 1)
+x = np.random.rand(100)
+#y = 2.0+5*x**2 + 0.1*np.random.randn(100,1)
+y = 2.0+5*x**2 + 0.1*np.random.randn(100)
+
+#To compute a 2nd order polynomial fit, I'd need a 3 feature feature matrix
+X = np.zeros((len(x), 3))
+X[:,0] = 1
+X[:,1] = x
+X[:,2] = x**2
+
+X_train, X_test, y_train, y_test = split_data(X, y)
+
+beta = np.linalg.inv( X_train.T @ X_train) @ X_train.T @ y_train
+print("====================")
+print(beta)
+y_tilde = X_train @ beta
+y_pred = X_test @ beta
+
+print("R2, training")
+print(R2(y_train, y_tilde))
+print("MSE, training")
+print(MSE(y_train, y_tilde))
+print("----------------")
+print("R2, test")
+print(R2(y_test, y_pred))
+print("MSE, test")
+print(MSE(y_test, y_pred))
+print("====================")
+
+
+plt.plot(y_test, 'o', color='orange', label='output')
+plt.plot(y_pred, label='model')
+plt.legend()
+plt.show()
+
