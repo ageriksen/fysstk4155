@@ -56,7 +56,7 @@ print("====================")
 
 
 plt.plot(y_test, 'o', color='orange', label='output')
-plt.plot(y_pred, label='model')
+plt.plot(y_pred, 'o', label='model')
 plt.legend()
 plt.show()
 
