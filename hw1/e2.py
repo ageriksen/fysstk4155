@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 
 #solution imports below
 import pandas as pd
+import sklearn.linear_model as skl
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 #
 
 def split_data(data, target, test_ratio=0.2):
@@ -37,24 +39,38 @@ X_train, X_test, y_train, y_test = split_data(X, y)
 
 beta = np.linalg.inv( X_train.T @ X_train) @ X_train.T @ y_train
 print("====================")
-print(beta)
+print("manual model")
+print("optimal beta\n", beta)
 y_tilde = X_train @ beta
 y_pred = X_test @ beta
 
 print("R2, training")
-print(R2(y_train, y_tilde))
+print("{:.2f}".format(R2(y_train, y_tilde)))
 print("MSE, training")
-print(MSE(y_train, y_tilde))
+print("{:.2f}".format(MSE(y_train, y_tilde)))
 print("----------------")
 print("R2, test")
-print(R2(y_test, y_pred))
+print("{:.2f}".format(R2(y_test, y_pred)))
 print("MSE, test")
-print(MSE(y_test, y_pred))
+print("{:.2f}".format(MSE(y_test, y_pred)))
+print("====================")
+
+
+
+"""
+implementing sklearn to compare
+"""
+clf = skl.LinearRegression().fit(X_train, y_train)
+y_predskl = clf.predict(X_test)
+
+print("sklearn model")
+print("R2 = {:.2f}".format(clf.score(X_test, y_test)))
+print("MSE = {:.2f}".format(mean_squared_error(y_predskl, y_test)))
 print("====================")
 
 
 plt.plot(y_test, 'o', color='orange', label='output')
-plt.plot(y_pred, label='model')
+plt.plot(y_pred, 'o', label='manual model')
+plt.plot(y_predskl, '+', label='skl model')
 plt.legend()
 plt.show()
-
