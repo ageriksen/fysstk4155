@@ -1,7 +1,9 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+#sklearn imports:
+import sklearn.linear_model as skl
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 
 #solution imports below
 import pandas as pd
@@ -74,3 +76,12 @@ plt.plot(y_pred, 'o', label='manual model')
 plt.plot(y_predskl, '+', label='skl model')
 plt.legend()
 plt.show()
+
+"""
+for sklearn method:
+"""
+clf = skl.LinearRegression().fit(X, y)
+ytilde = clf.predict(X)
+print("MSE: %.2f" % mean_squared_error(y, ytilde))
+print("R2 score: %.2f" % r2_score(y, ytilde))
+print(clf.coef_, clf.intercept_)
