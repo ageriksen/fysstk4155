@@ -1,0 +1,92 @@
+\documentclass[10pt]{revtex4-2}
+%\documentclass[10pt]{article}
+\listfiles               %  print all files needed to compile this document
+
+\usepackage{amsmath}
+\usepackage{xparse}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{bm}
+\usepackage[colorlinks=true,urlcolor=blue,citecolor=blue]{hyperref}
+\usepackage{color}
+\usepackage{physics}
+\usepackage{algorithm2e}
+\usepackage{algpseudocode}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable, booktabs, mathpazo}
+\usepackage{natbib}
+%
+\pgfplotsset{compat=1.17}
+
+%\pgfplotstableset{
+%    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
+%    every last row/.style={after row=\hline \bottomrule},
+%    every first column/.style={
+%        column type/.add={|}{}
+%        },
+%    every last column/.style={
+%        column type/.add={}{|}
+%        },
+%}
+%\pgfplotstableset{
+%    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
+%    every last row/.style={after row=\hline \bottomrule}
+%}
+
+%\begin{figure}[hbtp]
+%\includegraphics[scale=0.4]{.pdf}
+%\caption{}
+%\label{fig:}
+%\end{figure}
+
+%\begin{tikzpicture}
+%    \begin{axis}[
+%            title= Earth-Sun system, Forward Euler integration,
+%            xlabel={$x$},
+%            ylabel={$y$},
+%        ]
+%        \addplot table {../runresults/earthEuler2body.dat}
+%    \end{axis}
+%\end{tikzpicture}
+
+\begin{document}
+\section{Exercise 3: Mean values and Variances in Linear regression}
+
+Assuming the existence of a function $f(\bm{x})$ as well as a normally distributed error 
+$\bm{\varepsilon} \sim \mathcal{N}(0, \sigma^2)$ who describe our data. 
+
+\begin{align}
+	\bm{y} = f(\bm{x}) + \bm{\varepsilon}
+\end{align}
+
+We approximate the function with Linear regression, OLS. Here f is approximated by 
+$\bm{\tilde{y}}$. We minimize $(\bm{y} - \bm{\tilde{y}})^2$, with
+
+\begin{align}
+	\bm{\tilde{y}} = \bm{X}\bm{\beta}
+\end{align}
+
+The $\bm{X}$ here is the design- or feature-matrix.
+
+\subsection{}
+show the expectation value of $\bm{y}$ for a given element $i$ is 
+\begin{align}
+	\mathbb{E}(y_i) = \bm{X}_{i,*}\beta, 
+\end{align}
+and the variance is
+\begin{align}
+	\mbox{Var}(y_i) = \sigma^2.
+\end{align}
+\subsubsection{}
+the data set $\bm{y}$ is assumed modelled as a sum of the deterministic $f(\bm{x})$ and 
+the stochastic noise $\bm{\varepsilon}$. The mean of the set then should be modelled as 
+\begin{align}
+	\expval{\bm{y}} &= \frac{1}{n}\sum_{i=0}^{n-1} \big( f(\bm{x}) + \bm{\varepsilon} \big)\\
+		&= \frac{1}{n} \Big[ \sum_{i=0}^{n-1} f(\bm{x}) \; \sum_{i=0}^{n-1} \bm{\varepsilon}
+			\Big] \\
+		\expval{\bm{\varepsilon}} &\text{ is assumed to be } 0
+\end{align}
+
+%\bibliography{\string~/Documents/bibliography/Bibliography}
+\end{document}
+

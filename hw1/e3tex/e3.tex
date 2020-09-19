@@ -9,14 +9,14 @@
 \usepackage{bm}
 \usepackage[colorlinks=true,urlcolor=blue,citecolor=blue]{hyperref}
 \usepackage{color}
-%\usepackage{physics}
-%\usepackage{algorithm2e}
-%\usepackage{algpseudocode}
-%\usepackage{pgfplots}
-%\usepackage{pgfplotstable, booktabs, mathpazo}
-%\usepackage{natbib}
+\usepackage{physics}
+\usepackage{algorithm2e}
+\usepackage{algpseudocode}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable, booktabs, mathpazo}
+\usepackage{natbib}
 %
-%\pgfplotsset{compat=1.15}
+\pgfplotsset{compat=1.17}
 
 %\pgfplotstableset{
 %    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
@@ -50,7 +50,144 @@
 %\end{tikzpicture}
 
 \begin{document}
-Hello world
+\section{Exercise 3: Mean values and Variances in Linear regression}
+
+Assuming the existence of a function $f(\bm{x})$ as well as a normally distributed error 
+$\bm{\varepsilon} \sim \mathcal{N}(0, \sigma^2)$ who describe our data. 
+
+\begin{align}
+	\bm{y} = f(\bm{x}) + \bm{\varepsilon}
+\end{align}
+
+We approximate the function with Linear regression, OLS. Here f is approximated by 
+$\bm{\tilde{y}}$. We minimize $(\bm{y} - \bm{\tilde{y}})^2$, with
+
+\begin{align}
+	\bm{\tilde{y}} = \bm{X}\bm{\beta}
+\end{align}
+
+The $\bm{X}$ here is the design- or feature-matrix.
+
+\subsection{}
+show the expectation value of $\bm{y}$ for a given element $i$ is 
+\begin{align}
+	\mathbb{E}(y_i) = \bm{X}_{i,*}\bm{\beta}, 
+\end{align}
+and the variance is
+\begin{align}
+	\mbox{Var}(y_i) = \sigma^2.
+\end{align}
+\subsubsection{}
+the data set $\bm{y}$ is assumed modelled as a sum of the deterministic $f(\bm{x})$ and 
+the stochastic noise $\bm{\varepsilon}$. The mean of the set then should be modelled as 
+\begin{align}
+	\expval{\bm{y}_i} &= \frac{1}{n}\sum_{i=0}^{n-1} \big( f(\bm{x_i}) + \bm{\varepsilon}_i \big)
+		= \frac{1}{n} \Big[ \sum_{i=0}^{n-1} f(\bm{x}_i) \; \sum_{i=0}^{n-1} \bm{\varepsilon}_i
+			\Big] \\
+	 &= \frac{1}{n} \sum_{i=0}^{n-1} f(\bm{x}_i) 
+		= \frac{1}{n} \sum_{i=0}^{n-1} \bm{X}_{i,*}\bm{\beta} =\bm{X}_{i,*}\bm{\beta}
+\end{align}
+Where the $\bm{X}$  matrix and the  $\bm{\beta}$ vector are both deterministic,
+And so the mean is the values themselves. 
+
+As for the $\mbox{var}(\bm{y}_i)$
+\begin{align}
+	\mbox{Var}(\bm{y}_i) &=  \expval{ (\bm{y}_i - \expval{\bm{y}_i})^2 } 
+		= \expval{\bm{y}_i^2} - \expval{\bm{y}_i}^2 \\
+	&= \expval{( \bm{X}_{i,*}\bm{\beta} + \bm{\varepsilon} )^2} - (\bm{X}_{i,*}\bm{\beta})^2\\
+	&= (\bm{X}_{i,*}\bm{\beta})^2 + 2\expval{\bm{\varepsilon}}\bm{X}_{i,*}\bm{\beta}
+		\expval{\bm{\varepsilon}^2} - (\bm{X}_{i,*}\bm{\beta})^2 \\
+	&= \expval{\bm{\varepsilon}^2} = \mbox{Var}(\bm{\varepsilon}) = \sigma^2
+\end{align}
+Q.E.D
+
+\subsection{}
+With the OLS expression for the parameters $\bm{\beta}$, show
+\begin{align}
+	\expval{\bm{\beta}} = \bm{\beta}
+\end{align}
+\subsubsection{}
+The OLS expression for $\bm{\beta}$
+\begin{align}
+	\bm{\beta} &= \big( \bm{X^T}\bm{X} \big)^{-1} \bm{X^T} \bm{Y}. \\
+\end{align}
+So the mean value for beta is,
+\begin{align}
+	\expval{\bm{\beta}} &= \expval{ \big( \bm{X^T}\bm{X} \big)^{-1} \bm{X^T} \bm{Y} }
+		=  \big( \bm{X^T}\bm{X} \big)^{-1} \bm{X^T} \expval{\bm{Y}} \\
+	&=  (\bm{X^T}\bm{X} \big)^{-1} \bm{X^T} \bm{X}\bm{\beta} = \bm{\beta}
+\end{align}
+
+\subsection{}
+Show that the variance of $\bm{\beta}$ is 
+\begin{align}
+	\mbox{Var}(\bm{\beta}) = \sigma^2(\bm{X^T}\bm{X})^{-1}.
+\end{align}
+
+We'll start with the definition of variance, 
+\begin{align}
+	\mbox{Var}(\bm{\beta}) &= \expval{ ( \bm{beta} - \expval{\bm{beta}} )^2 }
+		= \expval{( \bm{beta} - \expval{\bm{beta}} )
+			( \bm{beta} - \expval{\bm{beta}} )^T } \\
+	&= \expval{\Big( \big( \bm{X^T}\bm{X} \big)^{-1} \bm{X^T} \bm{Y} 
+			- \bm{\beta}\Big) 
+		\Big( \big( \bm{X^T}\bm{X} \big)^{-1} \bm{X^T} \bm{Y}  
+			- \bm{\beta} \Big)^T } \\
+	&= \expval{ \big(\bm{X^T}\bm{X})^{-1}\bm{X^T}\bm{Y}
+			\bm{Y^T}\bm{X}\big(\bm{X^T}\bm{X})^{-1}
+		- \big(\bm{X^T}\bm{X})^{-1}\bm{X^T}\bm{Y}\bm{\beta^T}
+		- \bm{\beta}\bm{Y^T}\bm{X}\big(\bm{X^T}\bm{X})^{-1}
+		+ \bm{\beta}\bm{\beta^T} } \\
+	&= \big(\bm{X^T}\bm{X})^{-1}\bm{X^T}\expval{\bm{Y}\bm{Y^T}}
+			\bm{X}\big(\bm{X^T}\bm{X})^{-1} \\
+	&\;\;	- \big(\bm{X^T}\bm{X})^{-1}\bm{X^T}\expval{\bm{Y}}\bm{\beta^T} \\
+	&\;\;	- \bm{\beta}\expval{\bm{Y^T}}\bm{X}\big(\bm{X^T}\bm{X})^{-1} \\
+	&\;\;	+ \bm{\beta}\bm{\beta^T} \\
+	&= \big(\bm{X^T}\bm{X})^{-1}\bm{X^T}\expval{\bm{Y}\bm{Y^T}}
+			\bm{X}\big(\bm{X^T}\bm{X})^{-1} \\
+	&\;\;	- \big(\bm{X^T}\bm{X})^{-1}\bm{X^T}\bm{X}\bm{\beta}\bm{\beta^T} \\
+	&\;\;	- \bm{\beta}\bm{\beta^T}\bm{X^T}\bm{X}\big(\bm{X^T}\bm{X})^{-1} \\
+	&\;\;	+ \bm{\beta}\bm{\beta^T} \\
+	&\text{The products of the matrices and their inverse canceling to identities}
+		\nonumber \\
+	\mbox{Var}(\bm{\beta}) &= \big(\bm{X^T}\bm{X})^{-1}\bm{X^T}\expval{\bm{Y}\bm{Y^T}}
+			\bm{X}\big(\bm{X^T}\bm{X})^{-1} 
+		- \bm{\beta}\bm{\beta^T} \\
+	&=	\big(\bm{X^T}\bm{X})^{-1}\bm{X^T}
+		\expval{(\bm{X}\bm{\beta} + \bm{\varepsilon})
+				(\bm{\beta^T}\bm{X^T} + \bm{\varepsilon})}
+			\bm{X}\big(\bm{X^T}\bm{X})^{-1}
+	 	- \bm{\beta}\bm{\beta^T} \\
+	&=  \big(\bm{X^T}\bm{X})^{-1}\bm{X^T}
+		\expval{
+			\bm{X}\bm{\beta}\bm{\beta^T}\bm{X^T}
+			+ \bm{X}\bm{\beta}\bm{\varepsilon}
+			+ \bm{\varepsilon}\bm{\beta^T}\bm{X^T}
+			+ \bm{\varepsilon}^2
+		}
+		\bm{X}\big(\bm{X^T}\bm{X})^{-1}
+		- \bm{\beta}\bm{\beta^T} \\
+	&=	 \big(\bm{X^T}\bm{X}\big)^{-1}\bm{X^T}
+			\Big(\bm{X}\bm{\beta}\bm{\beta^T}\bm{X^T} 
+				+ \expval{\bm{\varepsilon}^2} \Big)
+			\bm{X}\big(\bm{X^T}\bm{X})^{-1}
+		- \bm{\beta}\bm{\beta^T}
+\end{align}
+Here, we have that $\expval{\bm{\varepsilon}^2}=\sigma^2$. Also, 
+$$ \big(\bm{X^T}\bm{X}\big)^{-1}\bm{X^T}\bm{X}
+	\bm{\beta}\bm{\beta^T}
+	\bm{X^T}\bm{X}\big(\bm{X^T}\bm{X}\big)^{-1} 
+	= \mathbb{1}\bm{\beta}\bm{\beta^T}\mathbb{1} = \bm{\beta}\bm{\beta^T}$$
+This lets us reduce the expression 
+\begin{align}
+	 \mbox{Var}(\bm{\beta}) &= 
+		\big(\bm{X^T}\bm{X}\big)^{-1}\bm{X^T} \sigma^2
+		\bm{X}\big(\bm{X^T}\bm{X}\big)^{-1}\\
+	&= \big(\bm{X^T}\bm{X}\big)^{-1}\bm{X^T}\bm{X}
+		\sigma^2\big(\bm{X^T}\bm{X}\big)^{-1}\\
+	&= \mathbb{1}\sigma^2\big(\bm{X^T}\bm{X}\big)^{-1}
+\end{align}
+Q.E.D
 %\bibliography{\string~/Documents/bibliography/Bibliography}
 \end{document}
 
