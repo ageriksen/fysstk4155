@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 #at this stage
 from sklearn.preprocessing import StandardScaler
 
+#setting seed
+np.random.seed(3155)
+
 #functions
 def split_data(data, target, test_ratio=0.2):
     #Split the inputs and outputs into training and test versions
@@ -69,7 +72,7 @@ _I = np.eye(p,p)
 nlambdas = 100
 MSEtrain = np.zeros(nlambdas)
 MSEtest = np.zeros(nlambdas)
-lambdas = np.logspace(-4, 1, nlambdas)
+lambdas = np.logspace(-4, 2, nlambdas)
 for i in range(nlambdas):
     lmbd = lambdas[i]
     beta_ridge = np.linalg.inv(X_train.T@X_train + lmbd*_I)@X_train.T@y_train
@@ -78,8 +81,8 @@ for i in range(nlambdas):
     MSEtrain[i] = MSE(y_train, ytilde_ridge)
     MSEtest[i] = MSE(y_test, ypred_ridge)
 
-plt.plot(MSEtrain, label="train")
-plt.plot(MSEtest, label="test")
+plt.plot(lambdas, MSEtrain, label="train")
+plt.plot(lambdas, MSEtest, label="test")
 plt.legend()
 plt.xlabel("$log_{10}(\lambda$)")
 plt.ylabel("MSE")
