@@ -1,0 +1,73 @@
+\documentclass[10pt]{revtex4-1}
+\listfiles               %  print all files needed to compile this document
+
+\usepackage{amsmath}
+\usepackage{xparse}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{bm}
+\usepackage[colorlinks=true,urlcolor=blue,citecolor=blue]{hyperref}
+\usepackage{color}
+\usepackage{physics}
+\usepackage{algorithm2e}
+\usepackage{algpseudocode}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable, booktabs, mathpazo}
+\usepackage{natbib}
+
+\pgfplotsset{compat=1.15}
+
+\pgfplotstableset{
+    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
+    every last row/.style={after row=\hline \bottomrule},
+    every first column/.style={
+        column type/.add={|}{}
+        },
+    every last column/.style={
+        column type/.add={}{|}
+        },
+}
+\pgfplotstableset{
+    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
+    every last row/.style={after row=\hline \bottomrule}
+}
+
+%\begin{figure}[hbtp]
+%\includegraphics[scale=0.4]{.pdf}
+%\caption{}
+%\label{fig:}
+%\end{figure}
+
+%\begin{tikzpicture}
+%    \begin{axis}[
+%            title= Earth-Sun system, Forward Euler integration,
+%            xlabel={$x$},
+%            ylabel={$y$},
+%        ]
+%        \addplot table {../runresults/earthEuler2body.dat}
+%    \end{axis}
+%\end{tikzpicture}
+
+\begin{document}
+\title{Regression and Resampling of Terrain data and the Franke function}
+\author{A. G. Eriksen}
+\begin{abstract}
+	We aim to create a model to predict terrain heights through linear regression methods 
+\end{abstract}
+\maketitle
+
+\section{introduction}
+The aims and rationales of the project. What we have done in the project. Brief summary of structure
+of the report
+\section{method}
+Theoretical models and technicalities
+\section{results}
+Results of study and discussion of results
+\section{conclusion}
+Beyond discussion, this is actually concluding things. 
+perspectives of study
+\section{appendix}
+extra material, e.g. superfluous code, tables and figures not fitting into the text itself.
+%\bibliography{\string~/Documents/bibliography/Bibliography}
+\end{document}
+
