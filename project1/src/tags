@@ -1,0 +1,66 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/a3c87ab5/
+FrankeFunction	burp.py	/^def FrankeFunction(x,y):$/;"	f
+FrankeFunction	frankefunction.py	/^def FrankeFunction(x,y):$/;"	f
+MSE	burp.py	/^def MSE(y, y_tilde): $/;"	f
+MSE	frankefunction.py	/^def MSE(target, model): $/;"	f
+MSE_test	burp.py	/^MSE_test = MSE(z_test, z_pred)$/;"	v
+MSE_train	burp.py	/^MSE_train = MSE(z_train, z_tilde)$/;"	v
+R2	burp.py	/^def R2(y, y_tilde):$/;"	f
+R2	frankefunction.py	/^def R2(target, model):$/;"	f
+X	burp.py	/^X = create_X(x, y, maxdeg)$/;"	v
+X	frankefunction.py	/^X = create_X(x, y, maxdegree)$/;"	v
+X_test	burp.py	/^X_train, X_test, z_train, z_test = split_data(X, z.ravel())$/;"	v
+X_test	frankefunction.py	/^X_test = X[test_indices]$/;"	v
+X_train	burp.py	/^X_train, X_test, z_train, z_test = split_data(X, z.ravel())$/;"	v
+X_train	frankefunction.py	/^X_train = X[train_indices]$/;"	v
+ax1	burp.py	/^ax1 = fig1.gca(projection='3d')$/;"	v
+ax1	frankefunction.py	/^ax1 = fig1.gca(projection='3d')$/;"	v
+beta	burp.py	/^beta = np.linalg.inv(X_train.T @ X_train) @ X_train.T @ z_train$/;"	v
+beta	frankefunction.py	/^beta = np.linalg.inv( X_train.T @ X_train ) @ X_train.T @ z_arr_train$/;"	v
+col_arr	frankefunction.py	/^col_arr = col_mat.ravel()$/;"	v
+col_mat	frankefunction.py	/^row_mat, col_mat = np.meshgrid(x,y)$/;"	v
+create_X	burp.py	/^def create_X(x, y, n ):$/;"	f
+create_X	frankefunction.py	/^def create_X(x, y, n ):$/;"	f
+fig1	burp.py	/^fig1 = plt.figure()$/;"	v
+fig1	frankefunction.py	/^fig1 = plt.figure()$/;"	v
+maxdeg	burp.py	/^maxdeg = 5$/;"	v
+maxdegree	frankefunction.py	/^maxdegree = 5$/;"	v
+np	burp.py	/^import numpy as np$/;"	I
+np	frankefunction.py	/^import numpy as np$/;"	I
+plt	burp.py	/^import matplotlib.pyplot as plt$/;"	I
+plt	frankefunction.py	/^import matplotlib.pyplot as plt$/;"	I
+row_arr	frankefunction.py	/^row_arr = row_mat.ravel()$/;"	v
+row_mat	frankefunction.py	/^row_mat, col_mat = np.meshgrid(x,y)$/;"	v
+split_data	burp.py	/^def split_data(data, target, test_ratio=0.2):$/;"	f
+split_data	frankefunction.py	/^def split_data(data, test_ratio=0.2):$/;"	f
+steplength	burp.py	/^steplength = 0.05$/;"	v
+steplength	frankefunction.py	/^steplength = 0.05$/;"	v
+surf	burp.py	/^surf = ax1.plot_surface(x, y, z, cmap=cm.coolwarm,$/;"	v
+surf	frankefunction.py	/^surf = ax1.plot_surface(row_mat, col_mat, z, cmap=cm.coolwarm,$/;"	v
+test_indices	frankefunction.py	/^test_indices, train_indices = split_data(X)$/;"	v
+train_indices	frankefunction.py	/^test_indices, train_indices = split_data(X)$/;"	v
+x	burp.py	/^x = np.arange(0, 1, steplength)$/;"	v
+x	burp.py	/^x = x.ravel()$/;"	v
+x	burp.py	/^x, y = np.meshgrid(x,y)$/;"	v
+x	frankefunction.py	/^x = np.arange(0, 1, steplength)$/;"	v
+y	burp.py	/^x, y = np.meshgrid(x,y)$/;"	v
+y	burp.py	/^y = np.arange(0, 1, steplength)$/;"	v
+y	burp.py	/^y = y.ravel()$/;"	v
+y	frankefunction.py	/^y = np.arange(0, 1, steplength)$/;"	v
+z	burp.py	/^z = FrankeFunction(x, y)$/;"	v
+z	burp.py	/^z = z.ravel()$/;"	v
+z	frankefunction.py	/^z = FrankeFunction(row_mat, col_mat)$/;"	v
+z_arr	frankefunction.py	/^z_arr = z.ravel()$/;"	v
+z_arr_test	frankefunction.py	/^z_arr_test = z_arr[test_indices]$/;"	v
+z_arr_train	frankefunction.py	/^z_arr_train = z_arr[train_indices]$/;"	v
+z_pred	burp.py	/^z_pred = X_test @ beta$/;"	v
+z_test	burp.py	/^X_train, X_test, z_train, z_test = split_data(X, z.ravel())$/;"	v
+z_tilde	burp.py	/^z_tilde = X_train @ beta$/;"	v
+z_train	burp.py	/^X_train, X_test, z_train, z_test = split_data(X, z.ravel())$/;"	v
