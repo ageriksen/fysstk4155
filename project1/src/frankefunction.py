@@ -85,14 +85,21 @@ z_arr = z.ravel()
 maxdegree = 5
 X = create_X(row_arr, col_arr, maxdegree)
 train_indices, test_indices = split_data(X)
+
 X_train = X[train_indices]; X_test = X[test_indices]
 z_arr_train = z_arr[train_indices]; z_arr_test = z_arr[test_indices]
 
+X_train_scaled = X_train-np.mean(X_train)
+X_test_scaled = X_test-np.mean(X_test)
+z_arr_train_scaled = z_arr_train-np.mean(z_arr_train)
+z_arr_test_scaled = z_arr_test-np.mean(z_arr_test)
 
-beta = np.linalg.inv( X_train.T @ X_train ) @ X_train.T @ z_arr_train
 
-z_tilde = X_train @ beta
-z_pred = X_test @ beta
-print("train MSE: {:.4f}".format(MSE(z_arr_train, z_tilde)))
-print("test MSE:  {:.4f}".format(MSE(z_arr_test, z_pred)))
+#beta = np.linalg.inv( X_train.T @ X_train ) @ X_train.T @ z_arr_train
+beta = np.linalg.inv( X_train_scaled.T @ X_train_scaled ) @ X_train_scaled.T @ z_arr_train_scaled
+
+z_tilde = X_train_scaled @ beta
+z_pred = X_test_scaled @ beta
+print("train MSE: {:.4f}".format(MSE(z_arr_train_scaled, z_tilde)))
+print("test MSE:  {:.4f}".format(MSE(z_arr_test_scaled, z_pred)))
 

@@ -19,3 +19,13 @@ previous matrix state, so the dimensions of the prediction and the input is diff
 	2. Could one "unflatten" the prediction?
 		*. Them could one reliably map it back onto the mesh?
 
+Adding scaling 
+-----------
+The requirement to scale the data was accomplished with the `np.mean()` method, s.a. 
+```python
+X_scaled = X-np.mean(X)
+```
+This is mainly from a discussion on piazza where the sklearn `StandardScaler`
+had some strange behaviour. Might replace later. might possibly make a function
+or a lambda function for it. 
+
