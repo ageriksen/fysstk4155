@@ -5,6 +5,7 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 import numpy as np
 from random import random, seed
+np.random.seed(2020)
 
 #Functions
 def FrankeFunction(x,y):
@@ -49,38 +50,36 @@ def MSE(y, y_tilde):
     n = np.size(y)
     return np.sum( (y-y_tilde)**2 )/n
 
-#Create figures
-fig1 = plt.figure()
-ax1 = fig1.gca(projection='3d')
-
 # Make data.
 steplength = 0.05
 x = np.arange(0, 1, steplength)
 y = np.arange(0, 1, steplength)
-x, y = np.meshgrid(x,y)
 
-z = FrankeFunction(x, y)
+row_mat, col_mat = np.meshgrid(x,y)
+z = FrankeFunction(row_mat, col_mat)
+
+#Create figures
+fig1 = plt.figure()
+ax1 = fig1.gca(projection='3d')
 # Plot the surface.
-surf = ax1.plot_surface(x, y, z, cmap=cm.coolwarm,
+surf = ax1.plot_surface(row_mat, col_mat, z, cmap=cm.coolwarm,
                        linewidth=0, antialiased=False)
-
 # Customize the z axis.
 ax1.set_zlim(-0.10, 1.40)
 ax1.zaxis.set_major_locator(LinearLocator(10))
 ax1.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-
 # Add a color bar which maps values to colors.
 fig1.colorbar(surf, shrink=0.5, aspect=5)
-
 plt.show()
 
-#========Manual OLS=================
-z = z.ravel()
-x = x.ravel()
-y = y.ravel()
+##########################
+
+row_arr = row_mat.ravel()
+col_arr = col_mat.ravel()
+z_arr = z.ravel()
 maxdeg = 5
-X = create_X(x, y, maxdeg)
-X_train, X_test, z_train, z_test = split_data(X, z.ravel())
+X = create_X(row_arr, col_arr, maxdeg)
+X_train, X_test, z_train, z_test = split_data(X,z_arr)# z.ravel())
 beta = np.linalg.inv(X_train.T @ X_train) @ X_train.T @ z_train
 z_tilde = X_train @ beta
 z_pred = X_test @ beta

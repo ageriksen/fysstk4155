@@ -83,17 +83,16 @@ col_arr = col_mat.ravel()
 z_arr = z.ravel()
 
 maxdegree = 5
-X = create_X(x, y, maxdegree)
-test_indices, train_indices = split_data(X)
+X = create_X(row_arr, col_arr, maxdegree)
+train_indices, test_indices = split_data(X)
+X_train = X[train_indices]; X_test = X[test_indices]
+z_arr_train = z_arr[train_indices]; z_arr_test = z_arr[test_indices]
 
-X_train = X[train_indices]
-X_test = X[test_indices]
-z_arr_train = z_arr[train_indices]
-z_arr_test = z_arr[test_indices]
 
 beta = np.linalg.inv( X_train.T @ X_train ) @ X_train.T @ z_arr_train
-#beta = np.linalg.inv( X_train.T @ X_train ) @ X_train.T @ z_train
 
-#z_tilde = X_train @ beta
-#z_pred = X_test @ beta
-#print("train MSE: {:.3f}".format(MSE(z_arr_train, z_tilde)))
+z_tilde = X_train @ beta
+z_pred = X_test @ beta
+print("train MSE: {:.4f}".format(MSE(z_arr_train, z_tilde)))
+print("test MSE:  {:.4f}".format(MSE(z_arr_test, z_pred)))
+
