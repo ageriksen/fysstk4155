@@ -55,12 +55,21 @@ def MSE(target, model):
 
 
 # Make data.
-steplength = 0.05
-x = np.arange(0, 1, steplength)
-y = np.arange(0, 1, steplength)
+nrow = 100
+ncol = 200
+rand_row        =       np.random.uniform(0, 1, size=nrow)
+rand_col        =       np.random.uniform(0, 1, size=ncol)
 
-row_mat, col_mat = np.meshgrid(x,y)
-z = FrankeFunction(row_mat, col_mat)
+sortrowindex    =       np.argsort(rand_row)
+sortcolindex    =       np.argsort(rand_col)
+
+rowsort         =       rand_row[sortrowindex]
+colsort         =       rand_col[sortcolindex]
+
+row_mat, col_mat = np.meshgrid(colsort, rowsort)
+
+noise = .01
+z = FrankeFunction(row_mat, col_mat) + noise*np.random.randn(nrow, ncol)
 
 #Create figures
 fig1 = plt.figure()
@@ -96,10 +105,16 @@ z_arr_test_scaled = z_arr_test-np.mean(z_arr_test)
 
 
 #beta = np.linalg.inv( X_train.T @ X_train ) @ X_train.T @ z_arr_train
-beta = np.linalg.inv( X_train_scaled.T @ X_train_scaled ) @ X_train_scaled.T @ z_arr_train_scaled
+beta = np.linalg.inv(X_train_scaled.T@X_train_scaled) @ X_train_scaled.T @ z_arr_train_scaled
+
+var_beta = np.diag(np.linalg.inv(X_train_scaled.T@X_train_scaled))
+
+print("beta's:\n", beta)
+print("beta variances:\n", var_beta)
 
 z_tilde = X_train_scaled @ beta
 z_pred = X_test_scaled @ beta
 print("train MSE: {:.4f}".format(MSE(z_arr_train_scaled, z_tilde)))
 print("test MSE:  {:.4f}".format(MSE(z_arr_test_scaled, z_pred)))
-
+print("train R2:  {:.4f}".format(R2(z_arr_train_scaled, z_tilde)))
+print("test R2:   {:.4f}".format(R2(z_arr_test_scaled, z_pred)))
