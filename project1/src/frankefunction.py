@@ -109,6 +109,7 @@ beta = np.linalg.inv(X_train_scaled.T@X_train_scaled) @ X_train_scaled.T @ z_arr
 
 #Variance extracted with the assumption of a variance of 1
 var_beta = np.diag(np.linalg.inv(X_train_scaled.T@X_train_scaled))
+
 #confidence intervals [mu - z\sigma/sqrt(n), mu + z\sigma/sqrt(n)], for C=95% -> z=1.96
 #according to teachers in piazza, drop the sqrt(n) cause of the \sigma^2 in the expression
 #for var(beta). 
@@ -116,7 +117,6 @@ z_ = 1.96 # from wikipedia for confidence of 95%
 confidences = z_*np.sqrt(var_beta)
 
 print("beta's:\n", beta)
-#print("beta variances:\n", var_beta)
 print("confidences beta:\n", confidences)
 
 z_tilde = X_train_scaled @ beta
