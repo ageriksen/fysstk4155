@@ -46,6 +46,9 @@ def split_data(data, test_ratio=0.2):
     #return data[train_indices], data[test_indices], target[train_indices], target[test_indices]
     return test_indices, train_indices
 
+def scale(data): 
+    return data - np.mean(data) 
+
 def R2(target, model):
     return 1 - ( np.sum( (target-model)**2 )/np.sum( (target-np.mean(target))**2 ) )
 
@@ -68,8 +71,8 @@ colsort         =       rand_col[sortcolindex]
 
 row_mat, col_mat = np.meshgrid(colsort, rowsort)
 
-noise = .01
-z = FrankeFunction(row_mat, col_mat) + noise*np.random.randn(nrow, ncol)
+sigma = .01
+z = FrankeFunction(row_mat, col_mat) + sigma*np.random.randn(nrow, ncol)
 
 #Create figures
 fig1 = plt.figure()
@@ -108,7 +111,7 @@ z_arr_test_scaled = z_arr_test-np.mean(z_arr_test)
 beta = np.linalg.inv(X_train_scaled.T@X_train_scaled) @ X_train_scaled.T @ z_arr_train_scaled
 
 #Variance extracted with the assumption of a variance of 1
-var_beta = np.diag(np.linalg.inv(X_train_scaled.T@X_train_scaled))
+var_beta = sigma**2*np.diag(np.linalg.inv(X_train_scaled.T@X_train_scaled))
 
 #confidence intervals [mu - z\sigma/sqrt(n), mu + z\sigma/sqrt(n)], for C=95% -> z=1.96
 #according to teachers in piazza, drop the sqrt(n) cause of the \sigma^2 in the expression
@@ -125,3 +128,39 @@ print("train MSE: {:.4f}".format(MSE(z_arr_train_scaled, z_tilde)))
 print("test MSE:  {:.4f}".format(MSE(z_arr_test_scaled, z_pred)))
 print("train R2:  {:.4f}".format(R2(z_arr_train_scaled, z_tilde)))
 print("test R2:   {:.4f}".format(R2(z_arr_test_scaled, z_pred)))
+
+betas = []
+var_betas = []
+train_fit = []
+test_fit = []
+MSEtest = np.zeros(maxdegree)
+MSEtrain = np.zeros(maxdegree)
+R2train = np.zeros(maxdegree)
+R2test = np.zeros(maxdegree)
+
+train_indices, test_indices = split_data(z_arr)
+z_arr_train = z_arr[train_indices]; z_arr_test = z_arr[test_indices]
+z_arr_train_scale = scale(z_arr_train); z_arr_test_scale = scale(z_arr_test)
+for deg in range(maxdegree):
+    X = create_X(row_arr, col_arr, deg)
+    X_train = X[train_indices]; X_test = X[test_indices]
+
+    X_train_scale = scale(X_train); X_test_scale = scale(X_test)
+
+    inversion = np.linalg.pinv(X_train_scale.T @ X_train_scale)
+    beta = inversion @ ( X_train_scale.T @ z_arr_train_scale )
+    betas.append(beta)
+    
+    z_tilde = X_train_scale @ beta
+    z_pred = X_test_scale @ beta
+    train_fit.append(z_tilde)
+    test_fit.append(z_pred)
+    MSEtrain[deg] = MSE(z_arr_train_scaled, z_tilde)
+    MSEtest[deg] = MSE(z_arr_test_scaled, z_pred)
+    R2train = R2(z_arr_train_scaled, z_tilde)
+    R2test = R2(z_arr_test_scaled, z_pred)
+
+    var_beta = sigma**2*np.diag(inversion)
+    var_betas.append(var_beta)
+
+
