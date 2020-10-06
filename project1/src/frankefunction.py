@@ -53,9 +53,20 @@ def R2(target, model):
     return 1 - ( np.sum( (target-model)**2 )/np.sum( (target-np.mean(target))**2 ) )
 
 def MSE(target, model): 
-    n = np.size(target)
-    return np.sum( (target-model)**2 )/n
+    #n = np.size(target)
+    #return np.sum( (target-model)**2 )/n
+    return np.mean( (target - model)**2 ) 
 
+########## These are likely problematic irt. overhead when running. 
+def ERROR(data, model): 
+    return np.mean( np.mean(    (data - model)**2, axis=1, keepdims=True    )   )
+
+def BIAS(data, model):
+    return np.mean( (data - np.mean(model, axis=1, keepdims=True))**2   )
+
+def VARIANCE(model):
+    return np.mean( np.var( model, axis=1, keepdims=True    )   )
+#########
 
 # Make data.
 nrow = 100
