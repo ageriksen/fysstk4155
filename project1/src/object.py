@@ -8,7 +8,11 @@ from random import random, seed
 np.random.seed(2020)
 
 def main():
+    
     row, col, franke = makeFranke()
+    #row, col, franke = makeFranke(100, 100, 0.01)
+    OLS(row, col, franke, 10)
+    Bootstrap(row, col, franke, 10, 0.01)
     return
 
 
@@ -61,16 +65,22 @@ def MSE(target, model):
     #return np.sum( (target-model)**2 )/n
     return np.mean( (target - model)**2 ) 
 
-########## These are likely problematic irt. overhead when running. 
-def ERROR(data, model): 
-    return np.mean( np.mean(    (data - model)**2, axis=1, keepdims=True    )   )
-
-def BIAS(data, model):
+def BIAS2(data, model):
     return np.mean( (data - np.mean(model, axis=1, keepdims=True))**2   )
 
 def VARIANCE(model):
-    return np.mean( np.var( model, axis=1, keepdims=True    )   )
-#########
+    return np.mean( np.var( model, axis=1, keepdims=True  )   )
+
+def plot2D(x, ylist, ylegends, xlabel, ylabel, title=False):
+    plt.figure()
+    for i in range(len(ylist)):
+        plt.plot(x, ylist[i], label=ylegends[i])
+    plt.legend()
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    if title!=bool:
+        plt.title(title)
+    plt.show()
 
 def plot3D(x, y, z, zlim_min=-.10, zlim_max=1.40 ):
     #Create figures
@@ -101,10 +111,10 @@ def makeFranke(rows=100, cols=200, sigma=1):
 
     franke = FrankeFunction(row_mat, col_mat) \
             +   sigma*np.random.randn(rows,cols)
-    plot3D(row_mat, col_mat, franke)
+    #plot3D(row_mat, col_mat, franke)
     return row_mat.ravel(), col_mat.ravel(), franke.ravel()
 
-def OLS(rowdata, coldata, target, maxdegree, sigma):
+def OLS(rowdata, coldata, target, maxdegree, sigma=1):
 
     betas = []
     fits = []
@@ -123,9 +133,12 @@ def OLS(rowdata, coldata, target, maxdegree, sigma):
         X = create_X(rowdata, coldata, deg)
         X_train = scale(X[train_indices])
         X_test = scale(X[test_indices])
+        X_train[0,:] = 1
+        X_test[0,:] = 1
+        #print(X_train)
 
         inverse = np.linalg.pinv(X_train.T @ X_train)
-        beta = inverse @ (X_train.T @ target )
+        beta = inverse @ (X_train.T @ target_train )
         target_fit = X_train @ beta
         target_pred = X_test @ beta
 
@@ -137,7 +150,55 @@ def OLS(rowdata, coldata, target, maxdegree, sigma):
         MSEpred[deg] = MSE(target_test, target_pred)
         R2fit[deg] = R2(target_train, target_fit)
         R2pred[deg] = R2(target_test, target_pred)
+    
+    plotlist = [MSEfit, MSEpred]
+    legendlist = ['train', 'test']
+    plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', 'MSE', 'Franke function OLS')
 
+def Bootstrap(rowdata, coldata, target, maxdegree, bootstraps, sigma=1):
+
+    mse = np.zeros(bootstraps, maxdegree)
+    err = np.zeros(bootstraps, maxdegree) 
+    bias= np.zeros(bootstraps, maxdegree)
+    var = np.zeros(bootstraps, maxdegree)
+
+
+    train_indices, test_indices = split_data(target)
+    target_TRAIN = scale(target[train_indices])
+    target_TEST = scale(target[test_indices])
+
+    for deg in range(maxdegree):
+        X = create_X(rowdata, coldata, deg)
+
+        for boot in range(bootstraps)
+            train_indices, test_indices = split_data(target_TRAIN)
+
+            target_train = scale(target_TRAIN[train_indices])
+            target_test = scale(target_TRAIN[test_indices])
+
+            X_train = scale(X[train_indices])
+            X_test = scale(X[test_indices])
+            X_train[0,:] = 1
+            X_test[0,:] = 1
+            #print(X_train)
+
+            inverse = np.linalg.pinv(X_train.T @ X_train)
+            beta = inverse @ (X_train.T @ target_train )
+            target_fit = X_train @ beta
+            target_pred = X_test @ beta
+            fits.append(target_fit)
+            preds.append(target_pred)
+            betas.append(beta)
+
+    bias[deg, boot]= BIAS2(target_test, target_pred)
+    var[deg, boot] = VARIANCE(target_pred)
+    err[deg, boot] = bias[deg] + var[deg]
+
+    plotlist = [err, bias, var]
+    legendlist = ['error', 'bias^2', 'variance']
+    plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', 'MSE', 'Franke, OLS, Bias-Variance')
+    #plot2D(np.arange(maxdegree), [bias], ['bias'], 'model', 'bias')
+    
 
 
 if __name__ == '__main__':
