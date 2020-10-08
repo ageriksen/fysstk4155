@@ -40,6 +40,7 @@ create_X	frankefunction.py	/^def create_X(x, y, n ):$/;"	f
 create_X	old/frankefunction.py	/^def create_X(x, y, n ):$/;"	f
 fig1	old/frankefunction.py	/^fig1 = plt.figure()$/;"	v
 inversion	old/frankefunction.py	/^    inversion = np.linalg.pinv(X_train_scale.T @ X_train_scale)$/;"	v
+kfoldCV	frankefunction.py	/^def kfoldCV(rowdata, coldata, target, maxdegree, folds, sigma=1):$/;"	f
 main	frankefunction.py	/^def main():$/;"	f
 makeFranke	frankefunction.py	/^def makeFranke(rows=100, cols=200, sigma=1):$/;"	f
 maxdegree	old/frankefunction.py	/^maxdegree = 20$/;"	v

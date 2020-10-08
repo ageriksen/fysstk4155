@@ -4,20 +4,25 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 import numpy as np
-from random import random, seed
 np.random.seed(2020)
 
+from sklearn.preprocessing import StandardScaler
+
 def main():
-    polydegree = 10; bootstraps = 1000; sigma = .1
+    polydegree = 10; bootstraps = 100; sigma = .1
     nrows = 100; ncols = 100
+    kfolds = 10
 
     row, col, franke = makeFranke()
     #row, col, franke = makeFranke(nrows, ncols, sigma)
 
-    OLS(row, col, franke, polydegree)
+    #OLS(row, col, franke, polydegree)
 
     #Bootstrap(row, col, franke, polydegree, bootstraps, sigma)
-    Bootstrap(row, col, franke, polydegree, bootstraps)
+    #Bootstrap(row, col, franke, polydegree, bootstraps)
+
+    kfoldCV(row, col, franke, polydegree, kfolds)
+
     return
 
 
@@ -68,7 +73,8 @@ def R2(target, model):
 def MSE(target, model): 
     #n = np.size(target)
     #return np.sum( (target-model)**2 )/n
-    return np.mean( (target - model)**2 ) 
+    #return np.mean( (target - model)**2 ) 
+    return np.mean( np.mean(    (target - model)**2, axis=1, keepdims=True ) )
 
 def BIAS2(data, model):
     return np.mean( (data - np.mean(model, axis=1, keepdims=True))**2   )
@@ -136,6 +142,7 @@ def OLS(rowdata, coldata, target, maxdegree, sigma=1):
     target_test = scale(target[test_indices])
     for deg in range(maxdegree):
         X = create_X(rowdata, coldata, deg)
+
         X_train = scale(X[train_indices])
         X_test = scale(X[test_indices])
         X_train[0,:] = 1
@@ -151,6 +158,7 @@ def OLS(rowdata, coldata, target, maxdegree, sigma=1):
         fits.append(target_fit)
         preds.append(target_pred)
         var_betas.append( sigma**2*np.diag(inverse) )
+
         MSEfit[deg] = MSE(target_train, target_fit)
         MSEpred[deg] = MSE(target_test, target_pred)
         R2fit[deg] = R2(target_train, target_fit)
@@ -218,7 +226,60 @@ def Bootstrap(rowdata, coldata, target, maxdegree, bootstraps, sigma=1):
     legendlist = ['error', 'bias^2', 'variance']
     plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', '', 'Bootstrap Bias-Variance Franke Test')
     
+def kfoldCV(rowdata, coldata, target, maxdegree, folds, sigma=1):
+    
+    mse_train = []
+    mse_tests = []
+    
+    train_indices, test_indices = split_data(target)
+    target_train = scale(target[train_indices])
+    target_test = scale(target[test_indices])
 
+    foldsize = int(len(target_train)/folds)
+
+    #write in foldsize, pick out k-fold and the rest from train_indices => np.delete(target, k-th fold) will do the trick
+    #should the scaling be per k-fold training set, or should it be done early? 
+
+    for deg in range(maxdegree):
+        X = create_X(rowdata, coldata, deg)
+        fits = []; preds = []; betas = []; k_tests = []; k_train = []
+    
+        
+
+        for k in range(folds):
+
+            kstart = k*foldsize
+            kstop = kstart+foldsize
+            foldindices = np.arange(kstart, kstop)
+
+            k_fold_indices = train_indices[foldindices]
+            k_train_indices = np.delete(train_indices, foldindices)
+            
+            k_target_train = target[k_train_indices]
+            k_target_test = target[k_fold_indices]
+
+            k_X_train = scale(X[k_train_indices])
+            k_X_test = scale(X[k_fold_indices])
+            k_X_train[0,:] = 1
+            k_X_test[0,:] = 1
+
+            inverse = np.linalg.pinv(k_X_train.T @ k_X_train)
+            beta = inverse @ (k_X_train.T @ k_target_train )
+            target_fit = k_X_train @ beta
+            target_pred = k_X_test @ beta
+
+            fits.append(target_fit)
+            preds.append(target_pred)
+            betas.append(beta)
+            k_tests.append(k_target_test)
+            k_train.append(k_target_train)
+
+
+
+        mse_train.append(MSE(np.array(k_train), np.array(fits)))
+        mse_tests.append(MSE(np.array(k_tests), np.array(preds)))
+
+    plot2D(np.arange(maxdegree), [mse_train, mse_tests], ['train', 'test'], 'model complexity', 'MSE')
 
 if __name__ == '__main__':
     main()
