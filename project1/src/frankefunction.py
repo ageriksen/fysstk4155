@@ -7,7 +7,20 @@ import numpy as np
 from random import random, seed
 np.random.seed(2020)
 
-#Functions
+def main():
+    polydegree = 10; bootstraps = 1000; sigma = .1
+    nrows = 100; ncols = 100
+
+    row, col, franke = makeFranke()
+    #row, col, franke = makeFranke(nrows, ncols, sigma)
+
+    OLS(row, col, franke, polydegree)
+
+    #Bootstrap(row, col, franke, polydegree, bootstraps, sigma)
+    Bootstrap(row, col, franke, polydegree, bootstraps)
+    return
+
+
 def FrankeFunction(x,y):
     term1 = 0.75*np.exp( -(0.25*(9*x - 2)**2) - 0.25*((9*y - 2)**2) )
     term2 = 0.75*np.exp( -((9*x + 1)**2)/49.0 - 0.1*(9*y + 1) )
@@ -57,130 +70,155 @@ def MSE(target, model):
     #return np.sum( (target-model)**2 )/n
     return np.mean( (target - model)**2 ) 
 
-########## These are likely problematic irt. overhead when running. 
-def ERROR(data, model): 
-    return np.mean( np.mean(    (data - model)**2, axis=1, keepdims=True    )   )
-
-def BIAS(data, model):
+def BIAS2(data, model):
     return np.mean( (data - np.mean(model, axis=1, keepdims=True))**2   )
 
 def VARIANCE(model):
-    return np.mean( np.var( model, axis=1, keepdims=True    )   )
-#########
+    return np.mean( np.var( model, axis=1, keepdims=True  )   )
 
-# Make data.
-nrow = 100
-ncol = 200
-rand_row        =       np.random.uniform(0, 1, size=nrow)
-rand_col        =       np.random.uniform(0, 1, size=ncol)
+def plot2D(x, ylist, ylegends, xlabel, ylabel, title=False):
+    plt.figure()
+    for i in range(len(ylist)):
+        plt.plot(x, ylist[i], label=ylegends[i])
+    plt.legend()
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    if title!=bool:
+        plt.title(title)
+    plt.show()
 
-sortrowindex    =       np.argsort(rand_row)
-sortcolindex    =       np.argsort(rand_col)
+def plot3D(x, y, z, zlim_min=-.10, zlim_max=1.40 ):
+    #Create figures
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    # Plot the surface.
+    surf = ax.plot_surface(x, y, z, cmap=cm.coolwarm,
+                           linewidth=0, antialiased=False)
+    # Customize the z axis.
+    ax.set_zlim(zlim_min, zlim_max)
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    # Add a color bar which maps values to colors.
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+    plt.show()
 
-rowsort         =       rand_row[sortrowindex]
-colsort         =       rand_col[sortcolindex]
+def makeFranke(rows=100, cols=200, sigma=1):
+    rand_row    =   np.random.uniform(0,1,  size=rows)
+    rand_col    =   np.random.uniform(0,1,  size=cols)
 
-row_mat, col_mat = np.meshgrid(colsort, rowsort)
+    sort_row_index  =   np.argsort(rand_row)
+    sort_col_index  =   np.argsort(rand_col)
 
-sigma = 1
-z = FrankeFunction(row_mat, col_mat) + sigma*np.random.randn(nrow, ncol)
+    rowsort =   rand_row[sort_row_index]
+    colsort =   rand_col[sort_col_index]
 
-#Create figures
-fig1 = plt.figure()
-ax1 = fig1.gca(projection='3d')
-# Plot the surface.
-surf = ax1.plot_surface(row_mat, col_mat, z, cmap=cm.coolwarm,
-                       linewidth=0, antialiased=False)
-# Customize the z axis.
-ax1.set_zlim(-0.10, 1.40)
-ax1.zaxis.set_major_locator(LinearLocator(10))
-ax1.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-# Add a color bar which maps values to colors.
-fig1.colorbar(surf, shrink=0.5, aspect=5)
-plt.show()
+    row_mat, col_mat    =   np.meshgrid( colsort, rowsort )
 
-##########################
+    franke = FrankeFunction(row_mat, col_mat) \
+            +   sigma*np.random.randn(rows,cols)
+    #plot3D(row_mat, col_mat, franke)
+    return row_mat.ravel(), col_mat.ravel(), franke.ravel()
 
-row_arr = row_mat.ravel()
-col_arr = col_mat.ravel()
-z_arr = z.ravel()
+def OLS(rowdata, coldata, target, maxdegree, sigma=1):
 
-maxdegree = 20
-#X = create_X(row_arr, col_arr, maxdegree)
-#train_indices, test_indices = split_data(X)
-#
-#X_train = X[train_indices]; X_test = X[test_indices]
-#z_arr_train = z_arr[train_indices]; z_arr_test = z_arr[test_indices]
-#
-#X_train_scaled = X_train-np.mean(X_train)
-#X_test_scaled = X_test-np.mean(X_test)
-#z_arr_train_scaled = z_arr_train-np.mean(z_arr_train)
-#z_arr_test_scaled = z_arr_test-np.mean(z_arr_test)
-#
-#
-##beta = np.linalg.inv( X_train.T @ X_train ) @ X_train.T @ z_arr_train
-#beta = np.linalg.inv(X_train_scaled.T@X_train_scaled) @ X_train_scaled.T @ z_arr_train_scaled
-#
-##Variance extracted with the assumption of a variance of 1
-#var_beta = sigma**2*np.diag(np.linalg.inv(X_train_scaled.T@X_train_scaled))
-#
-##confidence intervals [mu - z\sigma/sqrt(n), mu + z\sigma/sqrt(n)], for C=95% -> z=1.96
-##according to teachers in piazza, drop the sqrt(n) cause of the \sigma^2 in the expression
-##for var(beta). 
-#z_ = 1.96 # from wikipedia for confidence of 95%
-#confidences = z_*np.sqrt(var_beta)
-#
-#print("beta's:\n", beta)
-#print("confidences beta:\n", confidences)
-#
-#z_tilde = X_train_scaled @ beta
-#z_pred = X_test_scaled @ beta
-#print("train MSE: {:.4f}".format(MSE(z_arr_train_scaled, z_tilde)))
-#print("test MSE:  {:.4f}".format(MSE(z_arr_test_scaled, z_pred)))
-#print("train R2:  {:.4f}".format(R2(z_arr_train_scaled, z_tilde)))
-#print("test R2:   {:.4f}".format(R2(z_arr_test_scaled, z_pred)))
+    betas = []
+    fits = []
+    preds = []
+    var_betas = []
 
-betas = []
-var_betas = []
-train_fit = []
-test_fit = []
-MSEtest = np.zeros(maxdegree)
-MSEtrain = np.zeros(maxdegree)
-R2train = np.zeros(maxdegree)
-R2test = np.zeros(maxdegree)
+    MSEfit = np.zeros(maxdegree)
+    MSEpred =  np.zeros(maxdegree)
+    R2fit =  np.zeros(maxdegree)
+    R2pred = np.zeros(maxdegree)
 
-train_indices, test_indices = split_data(z_arr)
-z_arr_train = z_arr[train_indices]; z_arr_test = z_arr[test_indices]
-z_arr_train_scale = scale(z_arr_train); z_arr_test_scale = scale(z_arr_test)
-for deg in range(maxdegree):
-    X = create_X(row_arr, col_arr, deg)
-    X_train = X[train_indices]; X_test = X[test_indices]
+    train_indices, test_indices = split_data(target)
+    target_train = scale(target[train_indices])
+    target_test = scale(target[test_indices])
+    for deg in range(maxdegree):
+        X = create_X(rowdata, coldata, deg)
+        X_train = scale(X[train_indices])
+        X_test = scale(X[test_indices])
+        X_train[0,:] = 1
+        X_test[0,:] = 1
+        #print(X_train)
 
-    X_train_scale = scale(X_train); X_test_scale = scale(X_test)
+        inverse = np.linalg.pinv(X_train.T @ X_train)
+        beta = inverse @ (X_train.T @ target_train )
+        target_fit = X_train @ beta
+        target_pred = X_test @ beta
 
-    inversion = np.linalg.pinv(X_train_scale.T @ X_train_scale)
-    beta = inversion @ ( X_train_scale.T @ z_arr_train_scale )
-    betas.append(beta)
+        betas.append(beta)
+        fits.append(target_fit)
+        preds.append(target_pred)
+        var_betas.append( sigma**2*np.diag(inverse) )
+        MSEfit[deg] = MSE(target_train, target_fit)
+        MSEpred[deg] = MSE(target_test, target_pred)
+        R2fit[deg] = R2(target_train, target_fit)
+        R2pred[deg] = R2(target_test, target_pred)
     
-    z_tilde = X_train_scale @ beta
-    z_pred = X_test_scale @ beta
-    train_fit.append(z_tilde)
-    test_fit.append(z_pred)
+    plotlist = [MSEfit, MSEpred]
+    legendlist = ['train', 'test']
+    plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', 'MSE', 'Franke function OLS')
 
-    MSEtrain[deg] = MSE(z_arr_train_scale, z_tilde)
-    MSEtest[deg] = MSE(z_arr_test_scale, z_pred)
-    R2train = R2(z_arr_train_scale, z_tilde)
-    R2test = R2(z_arr_test_scale, z_pred)
+def Bootstrap(rowdata, coldata, target, maxdegree, bootstraps, sigma=1):
 
-    var_beta = sigma**2*np.diag(inversion)
-    var_betas.append(var_beta)
+    #mse = np.zeros((bootstraps, maxdegree))
+    #err = np.zeros((bootstraps, maxdegree)) 
+    #bias= np.zeros((bootstraps, maxdegree))
+    #var = np.zeros((bootstraps, maxdegree))
+    err_train = np.zeros(maxdegree) 
+    bias_train= np.zeros(maxdegree)
+    var_train = np.zeros(maxdegree)
+    err_test = np.zeros(maxdegree) 
+    bias_test= np.zeros(maxdegree)
+    var_test = np.zeros(maxdegree)
 
-polydegree = np.linspace(0, maxdegree, maxdegree)
-plt.figure()
-plt.plot(polydegree, MSEtrain, label='train')
-plt.plot(polydegree, MSEtest, label='test')
-plt.xlabel('polynomial degree')
-plt.ylabel('MSE')
-plt.title('OLS regression, Franke function')
-plt.legend()
-plt.show()
+
+    train_indices, test_indices = split_data(target)
+    target_TRAIN = scale(target[train_indices])
+    target_TEST = scale(target[test_indices])
+
+    for deg in range(maxdegree):
+        X = create_X(rowdata, coldata, deg)
+        fits = []; preds = []; betas = []
+
+        for boot in range(bootstraps):
+            train_indices, test_indices = split_data(target_TRAIN)
+
+            target_train = scale(target_TRAIN[train_indices])
+            target_test = scale(target_TRAIN[test_indices])
+
+            X_train = scale(X[train_indices])
+            X_test = scale(X[test_indices])
+            X_train[0,:] = 1
+            X_test[0,:] = 1
+
+            inverse = np.linalg.pinv(X_train.T @ X_train)
+            beta = inverse @ (X_train.T @ target_train )
+            target_fit = X_train @ beta
+            target_pred = X_test @ beta
+
+            fits.append(target_fit)
+            preds.append(target_pred)
+            betas.append(beta)
+
+
+        bias_train[deg]= BIAS2(target_train, fits)
+        var_train[deg] = VARIANCE(fits)
+        err_train[deg] = bias_train[deg] + var_train[deg]
+
+        bias_test[deg]= BIAS2(target_test, preds)
+        var_test[deg] = VARIANCE(preds)
+        err_test[deg] = bias_test[deg] + var_test[deg]
+
+    plotlist = [err_train, bias_train, var_train]
+    legendlist = ['error', 'bias^2', 'variance']
+    plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', '', 'Bootstrap Bias-Variance Franke Train')
+    plotlist = [err_test, bias_test, var_test]
+    legendlist = ['error', 'bias^2', 'variance']
+    plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', '', 'Bootstrap Bias-Variance Franke Test')
+    
+
+
+if __name__ == '__main__':
+    main()

@@ -6,46 +6,76 @@
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	0.0.0	/a3c87ab5/
+BIAS	old/frankefunction.py	/^def BIAS(data, model):$/;"	f
+BIAS2	frankefunction.py	/^def BIAS2(data, model):$/;"	f
+Bootstrap	frankefunction.py	/^def Bootstrap(rowdata, coldata, target, maxdegree, bootstraps, sigma=1):$/;"	f
+ERROR	old/frankefunction.py	/^def ERROR(data, model): $/;"	f
 FrankeFunction	frankefunction.py	/^def FrankeFunction(x,y):$/;"	f
+FrankeFunction	old/frankefunction.py	/^def FrankeFunction(x,y):$/;"	f
 MSE	frankefunction.py	/^def MSE(target, model): $/;"	f
+MSE	old/frankefunction.py	/^def MSE(target, model): $/;"	f
+MSEtest	old/frankefunction.py	/^MSEtest = np.zeros(maxdegree)$/;"	v
+MSEtrain	old/frankefunction.py	/^MSEtrain = np.zeros(maxdegree)$/;"	v
+OLS	frankefunction.py	/^def OLS(rowdata, coldata, target, maxdegree, sigma=1):$/;"	f
 R2	frankefunction.py	/^def R2(target, model):$/;"	f
-X	frankefunction.py	/^X = create_X(row_arr, col_arr, maxdegree)$/;"	v
-X_test	frankefunction.py	/^X_train = X[train_indices]; X_test = X[test_indices]$/;"	v
-X_test_scaled	frankefunction.py	/^X_test_scaled = X_test-np.mean(X_test)$/;"	v
-X_train	frankefunction.py	/^X_train = X[train_indices]; X_test = X[test_indices]$/;"	v
-X_train_scaled	frankefunction.py	/^X_train_scaled = X_train-np.mean(X_train)$/;"	v
-ax1	frankefunction.py	/^ax1 = fig1.gca(projection='3d')$/;"	v
-beta	frankefunction.py	/^beta = np.linalg.inv(X_train_scaled.T@X_train_scaled) @ X_train_scaled.T @ z_arr_train_scaled$/;"	v
-col_arr	frankefunction.py	/^col_arr = col_mat.ravel()$/;"	v
-col_mat	frankefunction.py	/^row_mat, col_mat = np.meshgrid(colsort, rowsort)$/;"	v
-colsort	frankefunction.py	/^colsort         =       rand_col[sortcolindex]$/;"	v
-confidences	frankefunction.py	/^confidences = z_*np.sqrt(var_beta)$/;"	v
+R2	old/frankefunction.py	/^def R2(target, model):$/;"	f
+R2test	old/frankefunction.py	/^    R2test = R2(z_arr_test_scale, z_pred)$/;"	v
+R2test	old/frankefunction.py	/^R2test = np.zeros(maxdegree)$/;"	v
+R2train	old/frankefunction.py	/^    R2train = R2(z_arr_train_scale, z_tilde)$/;"	v
+R2train	old/frankefunction.py	/^R2train = np.zeros(maxdegree)$/;"	v
+VARIANCE	frankefunction.py	/^def VARIANCE(model):$/;"	f
+VARIANCE	old/frankefunction.py	/^def VARIANCE(model):$/;"	f
+X	old/frankefunction.py	/^    X = create_X(row_arr, col_arr, deg)$/;"	v
+X_test	old/frankefunction.py	/^    X_train = X[train_indices]; X_test = X[test_indices]$/;"	v
+X_test_scale	old/frankefunction.py	/^    X_train_scale = scale(X_train); X_test_scale = scale(X_test)$/;"	v
+X_train	old/frankefunction.py	/^    X_train = X[train_indices]; X_test = X[test_indices]$/;"	v
+X_train_scale	old/frankefunction.py	/^    X_train_scale = scale(X_train); X_test_scale = scale(X_test)$/;"	v
+ax1	old/frankefunction.py	/^ax1 = fig1.gca(projection='3d')$/;"	v
+beta	old/frankefunction.py	/^    beta = inversion @ ( X_train_scale.T @ z_arr_train_scale )$/;"	v
+betas	old/frankefunction.py	/^betas = []$/;"	v
+col_arr	old/frankefunction.py	/^col_arr = col_mat.ravel()$/;"	v
+col_mat	old/frankefunction.py	/^row_mat, col_mat = np.meshgrid(colsort, rowsort)$/;"	v
+colsort	old/frankefunction.py	/^colsort         =       rand_col[sortcolindex]$/;"	v
 create_X	frankefunction.py	/^def create_X(x, y, n ):$/;"	f
-fig1	frankefunction.py	/^fig1 = plt.figure()$/;"	v
-maxdegree	frankefunction.py	/^maxdegree = 5$/;"	v
-ncol	frankefunction.py	/^ncol = 200$/;"	v
-noise	frankefunction.py	/^noise = .01$/;"	v
+create_X	old/frankefunction.py	/^def create_X(x, y, n ):$/;"	f
+fig1	old/frankefunction.py	/^fig1 = plt.figure()$/;"	v
+inversion	old/frankefunction.py	/^    inversion = np.linalg.pinv(X_train_scale.T @ X_train_scale)$/;"	v
+main	frankefunction.py	/^def main():$/;"	f
+makeFranke	frankefunction.py	/^def makeFranke(rows=100, cols=200, sigma=1):$/;"	f
+maxdegree	old/frankefunction.py	/^maxdegree = 20$/;"	v
+ncol	old/frankefunction.py	/^ncol = 200$/;"	v
 np	frankefunction.py	/^import numpy as np$/;"	I
-nrow	frankefunction.py	/^nrow = 100$/;"	v
+np	old/frankefunction.py	/^import numpy as np$/;"	I
+nrow	old/frankefunction.py	/^nrow = 100$/;"	v
+plot2D	frankefunction.py	/^def plot2D(x, ylist, ylegends, xlabel, ylabel, title=False):$/;"	f
+plot3D	frankefunction.py	/^def plot3D(x, y, z, zlim_min=-.10, zlim_max=1.40 ):$/;"	f
 plt	frankefunction.py	/^import matplotlib.pyplot as plt$/;"	I
-rand_col	frankefunction.py	/^rand_col        =       np.random.uniform(0, 1, size=ncol)$/;"	v
-rand_row	frankefunction.py	/^rand_row        =       np.random.uniform(0, 1, size=nrow)$/;"	v
-row_arr	frankefunction.py	/^row_arr = row_mat.ravel()$/;"	v
-row_mat	frankefunction.py	/^row_mat, col_mat = np.meshgrid(colsort, rowsort)$/;"	v
-rowsort	frankefunction.py	/^rowsort         =       rand_row[sortrowindex]$/;"	v
-sortcolindex	frankefunction.py	/^sortcolindex    =       np.argsort(rand_col)$/;"	v
-sortrowindex	frankefunction.py	/^sortrowindex    =       np.argsort(rand_row)$/;"	v
+plt	old/frankefunction.py	/^import matplotlib.pyplot as plt$/;"	I
+polydegree	old/frankefunction.py	/^polydegree = np.linspace(0, maxdegree, maxdegree)$/;"	v
+rand_col	old/frankefunction.py	/^rand_col        =       np.random.uniform(0, 1, size=ncol)$/;"	v
+rand_row	old/frankefunction.py	/^rand_row        =       np.random.uniform(0, 1, size=nrow)$/;"	v
+row_arr	old/frankefunction.py	/^row_arr = row_mat.ravel()$/;"	v
+row_mat	old/frankefunction.py	/^row_mat, col_mat = np.meshgrid(colsort, rowsort)$/;"	v
+rowsort	old/frankefunction.py	/^rowsort         =       rand_row[sortrowindex]$/;"	v
+scale	frankefunction.py	/^def scale(data): $/;"	f
+scale	old/frankefunction.py	/^def scale(data): $/;"	f
+sigma	old/frankefunction.py	/^sigma = 1$/;"	v
+sortcolindex	old/frankefunction.py	/^sortcolindex    =       np.argsort(rand_col)$/;"	v
+sortrowindex	old/frankefunction.py	/^sortrowindex    =       np.argsort(rand_row)$/;"	v
 split_data	frankefunction.py	/^def split_data(data, test_ratio=0.2):$/;"	f
-surf	frankefunction.py	/^surf = ax1.plot_surface(row_mat, col_mat, z, cmap=cm.coolwarm,$/;"	v
-test_indices	frankefunction.py	/^train_indices, test_indices = split_data(X)$/;"	v
-train_indices	frankefunction.py	/^train_indices, test_indices = split_data(X)$/;"	v
-var_beta	frankefunction.py	/^var_beta = np.diag(np.linalg.inv(X_train_scaled.T@X_train_scaled))$/;"	v
-z	frankefunction.py	/^z = FrankeFunction(row_mat, col_mat) + noise*np.random.randn(nrow, ncol)$/;"	v
-z_	frankefunction.py	/^z_ = 1.96 # from wikipedia for confidence of 95%$/;"	v
-z_arr	frankefunction.py	/^z_arr = z.ravel()$/;"	v
-z_arr_test	frankefunction.py	/^z_arr_train = z_arr[train_indices]; z_arr_test = z_arr[test_indices]$/;"	v
-z_arr_test_scaled	frankefunction.py	/^z_arr_test_scaled = z_arr_test-np.mean(z_arr_test)$/;"	v
-z_arr_train	frankefunction.py	/^z_arr_train = z_arr[train_indices]; z_arr_test = z_arr[test_indices]$/;"	v
-z_arr_train_scaled	frankefunction.py	/^z_arr_train_scaled = z_arr_train-np.mean(z_arr_train)$/;"	v
-z_pred	frankefunction.py	/^z_pred = X_test_scaled @ beta$/;"	v
-z_tilde	frankefunction.py	/^z_tilde = X_train_scaled @ beta$/;"	v
+split_data	old/frankefunction.py	/^def split_data(data, test_ratio=0.2):$/;"	f
+surf	old/frankefunction.py	/^surf = ax1.plot_surface(row_mat, col_mat, z, cmap=cm.coolwarm,$/;"	v
+test_fit	old/frankefunction.py	/^test_fit = []$/;"	v
+test_indices	old/frankefunction.py	/^train_indices, test_indices = split_data(z_arr)$/;"	v
+train_fit	old/frankefunction.py	/^train_fit = []$/;"	v
+train_indices	old/frankefunction.py	/^train_indices, test_indices = split_data(z_arr)$/;"	v
+var_beta	old/frankefunction.py	/^    var_beta = sigma**2*np.diag(inversion)$/;"	v
+var_betas	old/frankefunction.py	/^var_betas = []$/;"	v
+z	old/frankefunction.py	/^z = FrankeFunction(row_mat, col_mat) + sigma*np.random.randn(nrow, ncol)$/;"	v
+z_arr	old/frankefunction.py	/^z_arr = z.ravel()$/;"	v
+z_arr_test	old/frankefunction.py	/^z_arr_train = z_arr[train_indices]; z_arr_test = z_arr[test_indices]$/;"	v
+z_arr_test_scale	old/frankefunction.py	/^z_arr_train_scale = scale(z_arr_train); z_arr_test_scale = scale(z_arr_test)$/;"	v
+z_arr_train	old/frankefunction.py	/^z_arr_train = z_arr[train_indices]; z_arr_test = z_arr[test_indices]$/;"	v
+z_arr_train_scale	old/frankefunction.py	/^z_arr_train_scale = scale(z_arr_train); z_arr_test_scale = scale(z_arr_test)$/;"	v
+z_pred	old/frankefunction.py	/^    z_pred = X_test_scale @ beta$/;"	v
+z_tilde	old/frankefunction.py	/^    z_tilde = X_train_scale @ beta$/;"	v
