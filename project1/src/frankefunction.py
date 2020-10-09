@@ -16,7 +16,7 @@ def main():
     row, col, franke = makeFranke()
     #row, col, franke = makeFranke(nrows, ncols, sigma)
 
-    #OLS(row, col, franke, polydegree)
+    #noResampling(row, col, franke, polydegree)
 
     #Bootstrap(row, col, franke, polydegree, bootstraps, sigma)
     #Bootstrap(row, col, franke, polydegree, bootstraps)
@@ -125,7 +125,13 @@ def makeFranke(rows=100, cols=200, sigma=1):
     #plot3D(row_mat, col_mat, franke)
     return row_mat.ravel(), col_mat.ravel(), franke.ravel()
 
-def OLS(rowdata, coldata, target, maxdegree, sigma=1):
+def OLS(feature_matrix, targets):
+    inverse = np.linalg.pinv(feature_matrix.T @ feature_matrix)
+    beta = inverse @ (feature_matrix.T @ targets)
+    #return beta, np.diag(inverse)
+    return beta
+
+def noResampling(rowdata, coldata, target, maxdegree, sigma=1):
 
     betas = []
     fits = []
@@ -150,7 +156,8 @@ def OLS(rowdata, coldata, target, maxdegree, sigma=1):
         #print(X_train)
 
         inverse = np.linalg.pinv(X_train.T @ X_train)
-        beta = inverse @ (X_train.T @ target_train )
+        #beta = inverse @ (X_train.T @ target_train )
+        beta = OLS(X_train, target_train)
         target_fit = X_train @ beta
         target_pred = X_test @ beta
 
@@ -166,7 +173,7 @@ def OLS(rowdata, coldata, target, maxdegree, sigma=1):
     
     plotlist = [MSEfit, MSEpred]
     legendlist = ['train', 'test']
-    plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', 'MSE', 'Franke function OLS')
+    plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', 'MSE', 'Franke function no resampling')
 
 def Bootstrap(rowdata, coldata, target, maxdegree, bootstraps, sigma=1):
 
@@ -202,7 +209,8 @@ def Bootstrap(rowdata, coldata, target, maxdegree, bootstraps, sigma=1):
             X_test[0,:] = 1
 
             inverse = np.linalg.pinv(X_train.T @ X_train)
-            beta = inverse @ (X_train.T @ target_train )
+            #beta = inverse @ (X_train.T @ target_train )
+            beta = OLS(X_train, target_train)
             target_fit = X_train @ beta
             target_pred = X_test @ beta
 
@@ -264,7 +272,8 @@ def kfoldCV(rowdata, coldata, target, maxdegree, folds, sigma=1):
             k_X_test[0,:] = 1
 
             inverse = np.linalg.pinv(k_X_train.T @ k_X_train)
-            beta = inverse @ (k_X_train.T @ k_target_train )
+            #beta = inverse @ (k_X_train.T @ k_target_train )
+            beta = OLS(k_X_train, k_target_train)
             target_fit = k_X_train @ beta
             target_pred = k_X_test @ beta
 
