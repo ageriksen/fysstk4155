@@ -11,7 +11,7 @@ from sklearn.preprocessing import StandardScaler
 def main():
     polydegree = 10; bootstraps = 100; sigma = .1
     nrows = 100; ncols = 100
-    kfolds = 10
+    kfolds = 10; nlambdas = 10
 
     row, col, franke = makeFranke()
     #row, col, franke = makeFranke(nrows, ncols, sigma)
@@ -22,6 +22,8 @@ def main():
     #Bootstrap(row, col, franke, polydegree, bootstraps)
 
     kfoldCV(row, col, franke, polydegree, kfolds)
+
+    ridgeRegression(row, col, franke, polydegree, nlambdas, kfolds)
 
     return
 
@@ -125,11 +127,22 @@ def makeFranke(rows=100, cols=200, sigma=1):
     #plot3D(row_mat, col_mat, franke)
     return row_mat.ravel(), col_mat.ravel(), franke.ravel()
 
+def SVDinv(matrix):
+    U, s, VT = np.linalg.svd(matrix)
+    D = np.diagflat(s)
+    return VT.T @ ( np.linalg.inv(D) @ U.T)
+
 def OLS(feature_matrix, targets):
     inverse = np.linalg.pinv(feature_matrix.T @ feature_matrix)
     beta = inverse @ (feature_matrix.T @ targets)
     #return beta, np.diag(inverse)
     return beta
+
+def Ridge(feature_matrix, targets, lmbd):
+    print(targets)
+    XTX = feature_matrix.T@feature_matrix
+    inverse = SVDinv( XTX + lmbd*np.identity(len(XTX)) ) 
+    return inverse @ (feature_matrix @ targets)
 
 def noResampling(rowdata, coldata, target, maxdegree, sigma=1):
 
@@ -289,6 +302,71 @@ def kfoldCV(rowdata, coldata, target, maxdegree, folds, sigma=1):
         mse_tests.append(MSE(np.array(k_tests), np.array(preds)))
 
     plot2D(np.arange(maxdegree), [mse_train, mse_tests], ['train', 'test'], 'model complexity', 'MSE')
+
+
+def ridgeRegression(rowdata, coldata, target, maxdegree, nlambdas, folds, sigma=1):
+    
+    mse_train = []
+    mse_tests = []
+    
+    train_indices, test_indices = split_data(target)
+    target_train = target[train_indices]
+    target_test = target[test_indices]
+
+    foldsize = int(len(target_train)/folds)
+
+    lambdas = np.logspace(-5, 1, nlambdas)
+
+    #write in foldsize, pick out k-fold and the rest from train_indices => np.delete(target, k-th fold) will do the trick
+
+    for lmbd in range(nlambdas):
+        for deg in range(maxdegree):
+            X = create_X(rowdata, coldata, deg)
+            fits = []; preds = []; betas = []; k_tests = []; k_train = []
+        
+            for k in range(folds):
+
+                #Might be worth it to check out np.split() as well 
+                kstart = k*foldsize
+                kstop = kstart+foldsize
+                foldindices = np.arange(kstart, kstop)
+
+                k_fold_indices = train_indices[foldindices]
+                k_train_indices = np.delete(train_indices, foldindices)
+                
+                k_target_train = target[k_train_indices]
+                k_target_test = target[k_fold_indices]
+
+                k_X_train = X[k_train_indices]
+                k_X_test = X[k_fold_indices]
+
+                mean = np.mean(k_X_train)
+                k_X_train -= mean
+                k_X_test -= mean
+                k_target_train -= mean
+                k_target_test -= mean
+                k_X_train[0,:] = 1
+                k_X_test[0,:] = 1
+
+
+                inverse = np.linalg.pinv(k_X_train.T @ k_X_train)
+                #beta = inverse @ (k_X_train.T @ k_target_train )
+                beta = Ridge(k_X_train, k_target_train, lambdas[lmbd])
+                target_fit = k_X_train @ beta
+                target_pred = k_X_test @ beta
+
+                fits.append(target_fit)
+                preds.append(target_pred)
+                betas.append(beta)
+                k_tests.append(k_target_test)
+                k_train.append(k_target_train)
+
+
+
+            mse_train.append(MSE(np.array(k_train), np.array(fits)))
+            mse_tests.append(MSE(np.array(k_tests), np.array(preds)))
+
+    plot2D(np.arange(maxdegree), [mse_train, mse_tests], ['train', 'test'], 'model complexity', 'MSE', 'Ridge')
 
 if __name__ == '__main__':
     main()

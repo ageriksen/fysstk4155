@@ -8,68 +8,129 @@
 !_TAG_PROGRAM_VERSION	0.0.0	/a3c87ab5/
 BIAS	old/frankefunction.py	/^def BIAS(data, model):$/;"	f
 BIAS2	frankefunction.py	/^def BIAS2(data, model):$/;"	f
+BIAS2	object_oriented/objectified.py	/^    def BIAS2(self, data, model):$/;"	m	class:statistics
 Bootstrap	frankefunction.py	/^def Bootstrap(rowdata, coldata, target, maxdegree, bootstraps, sigma=1):$/;"	f
 ERROR	old/frankefunction.py	/^def ERROR(data, model): $/;"	f
+FrankeFunction	LinearRegressor.py	/^def FrankeFunction(x,y):$/;"	f
 FrankeFunction	frankefunction.py	/^def FrankeFunction(x,y):$/;"	f
+FrankeFunction	object_oriented/objectified.py	/^    def FrankeFunction(self, x , y):$/;"	m	class:System
 FrankeFunction	old/frankefunction.py	/^def FrankeFunction(x,y):$/;"	f
+LinReg	LinearRegressor.py	/^class LinReg:$/;"	c
 MSE	frankefunction.py	/^def MSE(target, model): $/;"	f
+MSE	object_oriented/objectified.py	/^    def MSE(self, target, model): $/;"	m	class:statistics
 MSE	old/frankefunction.py	/^def MSE(target, model): $/;"	f
 MSEtest	old/frankefunction.py	/^MSEtest = np.zeros(maxdegree)$/;"	v
 MSEtrain	old/frankefunction.py	/^MSEtrain = np.zeros(maxdegree)$/;"	v
-OLS	frankefunction.py	/^def OLS(rowdata, coldata, target, maxdegree, sigma=1):$/;"	f
+OLS	LinearRegressor.py	/^    def OLS(self, rows, cols, poly, target):$/;"	m	class:LinReg
+OLS	frankefunction.py	/^def OLS(feature_matrix, targets):$/;"	f
+OLS	object_oriented/objectified.py	/^    def OLS(self, feature_matrix, targets):$/;"	m	class:Solver
 R2	frankefunction.py	/^def R2(target, model):$/;"	f
+R2	object_oriented/objectified.py	/^    def R2(self, target, model):$/;"	m	class:statistics
 R2	old/frankefunction.py	/^def R2(target, model):$/;"	f
 R2test	old/frankefunction.py	/^    R2test = R2(z_arr_test_scale, z_pred)$/;"	v
 R2test	old/frankefunction.py	/^R2test = np.zeros(maxdegree)$/;"	v
 R2train	old/frankefunction.py	/^    R2train = R2(z_arr_train_scale, z_tilde)$/;"	v
 R2train	old/frankefunction.py	/^R2train = np.zeros(maxdegree)$/;"	v
+Ridge	frankefunction.py	/^def Ridge(feature_matrix, targets, lmbd):$/;"	f
+SVDinv	frankefunction.py	/^def SVDinv(matrix):$/;"	f
+Solver	object_oriented/objectified.py	/^class Solver:$/;"	c
+System	object_oriented/objectified.py	/^class System:$/;"	c
 VARIANCE	frankefunction.py	/^def VARIANCE(model):$/;"	f
+VARIANCE	object_oriented/objectified.py	/^    def VARIANCE(self, model):$/;"	m	class:statistics
 VARIANCE	old/frankefunction.py	/^def VARIANCE(model):$/;"	f
 X	old/frankefunction.py	/^    X = create_X(row_arr, col_arr, deg)$/;"	v
 X_test	old/frankefunction.py	/^    X_train = X[train_indices]; X_test = X[test_indices]$/;"	v
 X_test_scale	old/frankefunction.py	/^    X_train_scale = scale(X_train); X_test_scale = scale(X_test)$/;"	v
 X_train	old/frankefunction.py	/^    X_train = X[train_indices]; X_test = X[test_indices]$/;"	v
 X_train_scale	old/frankefunction.py	/^    X_train_scale = scale(X_train); X_test_scale = scale(X_test)$/;"	v
+__init__	LinearRegressor.py	/^    def __init__(self):$/;"	m	class:LinReg
+__init__	object_oriented/objectified.py	/^    def __init__(self):$/;"	m	class:scale
+__init__	object_oriented/objectified.py	/^    def __init__(self, nrows=100, ncols=100, sigma=1):$/;"	m	class:System
+__init__	object_oriented/objectified.py	/^    def __init__(self, poly):$/;"	m	class:statistics
+__init__	object_oriented/objectified.py	/^    def __init__(self, system):$/;"	m	class:Solver
 ax1	old/frankefunction.py	/^ax1 = fig1.gca(projection='3d')$/;"	v
 beta	old/frankefunction.py	/^    beta = inversion @ ( X_train_scale.T @ z_arr_train_scale )$/;"	v
 betas	old/frankefunction.py	/^betas = []$/;"	v
+col_arr	LinearRegressor.py	/^    col_arr = col_mat.ravel()$/;"	v
 col_arr	old/frankefunction.py	/^col_arr = col_mat.ravel()$/;"	v
+col_mat	LinearRegressor.py	/^    row_mat, col_mat    =   np.meshgrid( colsort, rowsort )$/;"	v
 col_mat	old/frankefunction.py	/^row_mat, col_mat = np.meshgrid(colsort, rowsort)$/;"	v
+colsort	LinearRegressor.py	/^    colsort =   rand_col[sort_col_index]$/;"	v
 colsort	old/frankefunction.py	/^colsort         =       rand_col[sortcolindex]$/;"	v
 create_X	frankefunction.py	/^def create_X(x, y, n ):$/;"	f
 create_X	old/frankefunction.py	/^def create_X(x, y, n ):$/;"	f
+featureMatrix	LinearRegressor.py	/^    def featureMatrix(self, x, y, n ):$/;"	m	class:LinReg
+featureMatrix	object_oriented/objectified.py	/^    def featureMatrix(self, n):$/;"	m	class:Solver
 fig1	old/frankefunction.py	/^fig1 = plt.figure()$/;"	v
+fit	object_oriented/objectified.py	/^    def fit(self, fitting):$/;"	m	class:scale
+franke	LinearRegressor.py	/^    franke = FrankeFunction(row_mat, col_mat) \\$/;"	v
+generateInputs	object_oriented/objectified.py	/^    def generateInputs(self):$/;"	m	class:System
 inversion	old/frankefunction.py	/^    inversion = np.linalg.pinv(X_train_scale.T @ X_train_scale)$/;"	v
 kfoldCV	frankefunction.py	/^def kfoldCV(rowdata, coldata, target, maxdegree, folds, sigma=1):$/;"	f
 main	frankefunction.py	/^def main():$/;"	f
+main	object_oriented/objectified.py	/^def main():$/;"	f
 makeFranke	frankefunction.py	/^def makeFranke(rows=100, cols=200, sigma=1):$/;"	f
 maxdegree	old/frankefunction.py	/^maxdegree = 20$/;"	v
 ncol	old/frankefunction.py	/^ncol = 200$/;"	v
+ncols	LinearRegressor.py	/^    nrows = 100; ncols = 200$/;"	v
+noResample	object_oriented/objectified.py	/^    def noResample(self, X, target_train, target_test):$/;"	m	class:Solver
+noResampling	frankefunction.py	/^def noResampling(rowdata, coldata, target, maxdegree, sigma=1):$/;"	f
+np	LinearRegressor.py	/^import numpy as np$/;"	I
 np	frankefunction.py	/^import numpy as np$/;"	I
+np	object_oriented/objectified.py	/^import numpy as np$/;"	I
 np	old/frankefunction.py	/^import numpy as np$/;"	I
 nrow	old/frankefunction.py	/^nrow = 100$/;"	v
+nrows	LinearRegressor.py	/^    nrows = 100; ncols = 200$/;"	v
 plot2D	frankefunction.py	/^def plot2D(x, ylist, ylegends, xlabel, ylabel, title=False):$/;"	f
+plot2D	object_oriented/objectified.py	/^    def plot2D(self, title=False):$/;"	m	class:statistics
 plot3D	frankefunction.py	/^def plot3D(x, y, z, zlim_min=-.10, zlim_max=1.40 ):$/;"	f
+plot3D	object_oriented/objectified.py	/^    def plot3D(self, x, y, z, zlim_min=-.10, zlim_max=1.40 ):$/;"	m	class:statistics
+plt	LinearRegressor.py	/^import matplotlib.pyplot as plt$/;"	I
 plt	frankefunction.py	/^import matplotlib.pyplot as plt$/;"	I
+plt	object_oriented/objectified.py	/^import matplotlib.pyplot as plt$/;"	I
 plt	old/frankefunction.py	/^import matplotlib.pyplot as plt$/;"	I
+polydegree	LinearRegressor.py	/^    polydegree = 10; sigma = 1$/;"	v
 polydegree	old/frankefunction.py	/^polydegree = np.linspace(0, maxdegree, maxdegree)$/;"	v
+rand_col	LinearRegressor.py	/^    rand_col    =   np.random.uniform(0,1,  size=ncols)$/;"	v
 rand_col	old/frankefunction.py	/^rand_col        =       np.random.uniform(0, 1, size=ncol)$/;"	v
+rand_row	LinearRegressor.py	/^    rand_row    =   np.random.uniform(0,1,  size=nrows)$/;"	v
 rand_row	old/frankefunction.py	/^rand_row        =       np.random.uniform(0, 1, size=nrow)$/;"	v
+regression	LinearRegressor.py	/^    regression = LinReg()$/;"	v
+ridgeRegression	frankefunction.py	/^def ridgeRegression(rowdata, coldata, target, maxdegree, nlambdas, folds, sigma=1):$/;"	f
+row_arr	LinearRegressor.py	/^    row_arr = row_mat.ravel()$/;"	v
 row_arr	old/frankefunction.py	/^row_arr = row_mat.ravel()$/;"	v
+row_mat	LinearRegressor.py	/^    row_mat, col_mat    =   np.meshgrid( colsort, rowsort )$/;"	v
 row_mat	old/frankefunction.py	/^row_mat, col_mat = np.meshgrid(colsort, rowsort)$/;"	v
+rowsort	LinearRegressor.py	/^    rowsort =   rand_row[sort_row_index]$/;"	v
 rowsort	old/frankefunction.py	/^rowsort         =       rand_row[sortrowindex]$/;"	v
 scale	frankefunction.py	/^def scale(data): $/;"	f
+scale	object_oriented/objectified.py	/^class scale:$/;"	c
 scale	old/frankefunction.py	/^def scale(data): $/;"	f
+setBootstraps	object_oriented/objectified.py	/^    def setBootstraps(self, bootstraps):$/;"	m	class:Solver
+setPolyDegree	object_oriented/objectified.py	/^    def setPolyDegree(self, degree):$/;"	m	class:Solver
+setSigma	object_oriented/objectified.py	/^    def setSigma(self, sigma):$/;"	m	class:Solver
+setTestRatio	object_oriented/objectified.py	/^    def setTestRatio(self, testRatio):$/;"	m	class:Solver
+setkFolds	object_oriented/objectified.py	/^    def setkFolds(self, kfolds):$/;"	m	class:Solver
+sigma	LinearRegressor.py	/^    polydegree = 10; sigma = 1$/;"	v
 sigma	old/frankefunction.py	/^sigma = 1$/;"	v
+solve	object_oriented/objectified.py	/^    def solve(self, solver):$/;"	m	class:Solver
+sort_col_index	LinearRegressor.py	/^    sort_col_index  =   np.argsort(rand_col)$/;"	v
+sort_row_index	LinearRegressor.py	/^    sort_row_index  =   np.argsort(rand_row)$/;"	v
 sortcolindex	old/frankefunction.py	/^sortcolindex    =       np.argsort(rand_col)$/;"	v
 sortrowindex	old/frankefunction.py	/^sortrowindex    =       np.argsort(rand_row)$/;"	v
 split_data	frankefunction.py	/^def split_data(data, test_ratio=0.2):$/;"	f
+split_data	object_oriented/objectified.py	/^    def split_data(self, data):$/;"	m	class:Solver
 split_data	old/frankefunction.py	/^def split_data(data, test_ratio=0.2):$/;"	f
+statistics	object_oriented/objectified.py	/^class statistics:$/;"	c
+store	object_oriented/objectified.py	/^    def store(self, deg, train, test, fit, pred):$/;"	m	class:statistics
 surf	old/frankefunction.py	/^surf = ax1.plot_surface(row_mat, col_mat, z, cmap=cm.coolwarm,$/;"	v
+target	LinearRegressor.py	/^    target = franke.ravel()$/;"	v
 test_fit	old/frankefunction.py	/^test_fit = []$/;"	v
 test_indices	old/frankefunction.py	/^train_indices, test_indices = split_data(z_arr)$/;"	v
+trainTest	LinearRegressor.py	/^    def trainTest(self, data, test_ratio=0.2):$/;"	m	class:LinReg
 train_fit	old/frankefunction.py	/^train_fit = []$/;"	v
 train_indices	old/frankefunction.py	/^train_indices, test_indices = split_data(z_arr)$/;"	v
+transform	object_oriented/objectified.py	/^    def transform(self, data):$/;"	m	class:scale
 var_beta	old/frankefunction.py	/^    var_beta = sigma**2*np.diag(inversion)$/;"	v
 var_betas	old/frankefunction.py	/^var_betas = []$/;"	v
 z	old/frankefunction.py	/^z = FrankeFunction(row_mat, col_mat) + sigma*np.random.randn(nrow, ncol)$/;"	v
