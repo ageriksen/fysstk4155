@@ -139,7 +139,7 @@ def OLS(feature_matrix, targets):
     return beta
 
 def Ridge(feature_matrix, targets, lmbd):
-    print(targets)
+    #print(targets)
     XTX = feature_matrix.T@feature_matrix
     inverse = SVDinv( XTX + lmbd*np.identity(len(XTX)) ) 
     return inverse @ (feature_matrix @ targets)

@@ -1,4 +1,5 @@
-\documentclass[10pt]{revtex4-1}
+\documentclass[12pt]{revtex4-2}
+%\documentclass[12pt]{article}
 \listfiles               %  print all files needed to compile this document
 
 \usepackage{amsmath}
@@ -10,6 +11,7 @@
 \usepackage{color}
 \usepackage{physics}
 \usepackage{algorithm2e}
+%\usepackage{algorithmic}
 \usepackage{algpseudocode}
 \usepackage{pgfplots}
 \usepackage{pgfplotstable, booktabs, mathpazo}
@@ -49,18 +51,187 @@
 %\end{tikzpicture}
 
 \begin{document}
-\title{Regression and Resampling of Terrain data and the Franke function}
+\title{%
+	project 1, FYS-STK4155 \\
+	\large Regression and Resampling of Terrain data and the Franke function}
 \author{A. G. Eriksen}
+\date{\today}
 \begin{abstract}
-	We aim to create a model to predict terrain heights through linear regression methods 
+	The project motivation lies in exploring linear regression methods with regards 
+	to simulated and real terrain data. \\
+	The Ordinary Least Squares method has been explored for the simulated terrain, 
+	both with and without resampling methods. \\
+	The resampling methods used are the bootstrap and k-fold Cross validation 
+	methods. \\
+	The intent was to implement Ridge regression and Lasso regression for 
+	the simulated data and then move on to the real terrain, but time ran out and 
+	bugs kept popping up. The only data here are from the OLS
 \end{abstract}
 \maketitle
+\tableofcontents
 
 \section{introduction}
-The aims and rationales of the project. What we have done in the project. Brief summary of structure
-of the report
+The aims and rationales of the project. What we have done in the project. Brief 
+summary of structure of the report. 
+
+The aim for the project was to explore regression methods for predicting an assumed 
+functional dependence. To build up and test the methods we used a function called the
+"Franke function"\cite{franke1979critical} to simulate a terrain and provide a definitive
+functional dependency between the input data and the targets. \\
+
+The initial regression was made using various polynomial interpolations as the basis, 
+and studying the results of the fit for various models to try and map out error 
+estimates in regards to the complexity of the models. \\
+
+Once the simplest models were tested we added resampling of the generated data using the 
+bootstrap method to improve and explore the accuracy of the models, exploring the bias-
+variance trade-off in particular. \\
+
+We move on to compare with a different, popular resampling method called k-fold Cross-
+Validation(k-fold CV). This would provide some comparisons with the bootstrap method.
+
+Following this, the intent was to implement a few more regression methods and explore
+reductions in the variance of the model predictions from penalising specific features 
+of the model, resulting in more stable predictions. Once this was done we could bring the
+code to actual terrain data, whose assumed functional dependency we could not know, nor
+really could guarantee and go over the various regression and resampling methods for 
+the predictions. Time ran out and this remains unexplored. 
+
 \section{method}
 Theoretical models and technicalities
+
+The basis for the regressions used here, is the Franke function\cite{franke1979critical}
+\begin{align}
+ f(x,y) &= \frac{3}{4}\exp{\left(-\frac{(9x-2)^2}{4} - \frac{(9y-2)^2}{4}\right)} 
+	\nonumber\\
+		&+\frac{3}{4}\exp{\left(-\frac{(9x+1)^2}{49}- \frac{(9y+1)}{10}\right)} 
+	\nonumber\\
+		&+\frac{1}{2}\exp{\left(-\frac{(9x-7)^2}{4} - \frac{(9y-3)^2}{4}\right)} 
+	\nonumber\\
+		&-\frac{1}{5}\exp{\left(-(9x-4)^2 - (9y-7)^2\right) }.
+\label{franke}
+\end{align}
+The function is defined for values $x, y \in [0, 1]$. To make the simulation more 
+authentic, noise can be added when generating the targets through the function, with a
+normally distributed noise, $\varepsilon$. Here $\varepsilon$ follows a normal 
+distribution of $\mathcal{N}(0, 1)$, $\sigma^2=1$. Though the strength of the noise can 
+be varied to highlight statistical effects. \\
+
+The input x and y values are generated as arrays, either through a normal distribution 
+of numbers in the range and then sorted, or just as a range or linearly spaced array 
+with a given amount of elements. Though to get a proper terrain grid, we need to mesh 
+the 2 together. Once this is done, we generally flatten the arrays before working on 
+them to simplify things. 
+
+The regression model can be written as a matrix-vector product,
+\begin{align}
+	\tilde{y} = \mathbf{X}\beta.
+\end{align}
+This is based on an assumption that the target values are dependent on the input 
+variables along a model like
+\begin{align}
+	\mathbf{y} = \mathbf{f(x)} + \varepsilon
+\end{align}
+This allows us to define a cost function dependent on $\beta$, it's derivative and the
+optimal $\beta$:\cite{hastie2009elements} \cite{morten2020lecturenotes}
+\begin{align}
+	C(\bm{\beta}) &= \frac{1}{n} \big\{ ( \bm{y} - \bm{X}\bm{\beta} )^2 \big\} ,
+	\label{costfunc}\\
+	\pdv{C(\bm{\beta}}{\bm{\beta}} &= 0 = \bm{X^T}\qty(\bm{y} - \bm{X}\bm{\beta}), \\
+	\bm{\hat{\beta}} &= \qty(\bm{X^T}\bm{X})^{-1} \bm{X^T}\bm{y}.
+	 \label{betaoptimal}
+\end{align}
+
+With an expression for the optimal beta, we now have to find a way to build our 
+feature matrix for a polynomial of the n-th degree, to allow for varying model 
+complexity.
+
+\begin{algorithm}
+	\DontPrintSemicolon
+	\KwIn{$\bm{x}$ and $\bm{y}$ and polynomial degree $n$}
+	\KwOut{Feature matrix X with dimension $mxn$}
+	$n \gets length(\bm{x})$\;
+	$m \gets int((n+1)\cdot (n+2)/2)$\;
+	$X \gets matrix.ones(nxm)$\;
+	\For{$i \gets 1$ \textbf{to} $n+1$}{
+		$q \gets int((i)*(i+1)/2)$\;	
+		\For{$k \gets 0$ \textbf{to} $i+1$}{
+			$X_{(:, q+k)} \gets x^{i-k}\cdot y^k$\;
+		}
+	}
+	\Return{$X$}\;
+\caption{make feature matrix X given input $\vec{x}, \vec{y}$ and dimension n}
+\label{alg:design}
+\end{algorithm}
+with an algorithm for the feature matrix and a set of targets generated by the Franke 
+function we just need to fit the features and predict an output. Following this, we can 
+apply various statistics to compare the model to the targets. These would include
+\begin{align}
+	MSE(y, \tilde{y}) &= \frac{1}{n}\sum_{i=0}^{n-1}(y_i - \tilde{y_i})^2
+		= \mathbb{E}[(y - \tilde{y})^2],
+		\label{MSE} \\
+	R^2(y, \tilde{y}) &= 1 - \frac{\sum_{i=0}^{n-1}(y_i - \tilde{y_i})^2}
+		{\sum_{i=0}^{n-1}(y_i - \mathbb{E}[y])^2} 
+		\label{R2}, \\
+	\mathbb{E}[y] &= \frac{1}{n}\sum_{i=0}^{n-1} y_i \label{mean}, \\
+	\mathbb{E}[(y - \tilde{y})^2] 
+		&=...= \mathbb{E}[(y -\mathbb{E}[\tilde{y}])^2] 
+			+ \mathbb{E}[(\tilde{y} - \mathbb{E}[\tilde{y}])^2] 
+			+ \sigma^2 \label{bias-variance-error}, \\
+	\mathbf{Bias}(y, \tilde{y} &= \mathbb{E}[(y -\mathbb{E}[\tilde{y}])^2] ,
+		\label{bias} \\
+	\mathbf{Var}(\tilde{y}) &= \mathbb{E}[(\tilde{y} - \mathbb{E}[\tilde{y}])^2] ,
+		\label{variance} \\
+	MSE(y, \tilde{y}) &= \mathbf{Bias}(y, \tilde{y}) + \mathbf{Var}(\tilde{y}) + \sigma^2
+		\label{bias-variance}.
+\end{align}
+
+Moving on from this, we can begin to refine the data we have somewhat, using resampling 
+methods. The ones we will make use of, are Bootstrap and k-fold Cross Validation. 
+The essence here, is that we have a limited data set. To compensate for this, methods of
+selecting which data to run allows us to make the best use of what data we do have. 
+
+\begin{algorithm}
+	\DontPrintSemicolon
+	\KwIn{feature matrix, $X$, targets, $y$, and number of bootstraps, $N$}
+	\KwOut{model fits and predictions}
+	$\bm{\tilde{y}^{fit}} \gets \mathbf{array}(N)$\;
+	$\bm{\tilde{y}^{predict}} \gets \mathbf{array}(N)$\;
+	$\bm{\beta} \gets \mathbf{array}(N)$\;
+	\For{$i \gets 0$ \textbf{to} $N$}{
+		Shuffle $X$ and $y$\;
+		Split data into training and test sets\;
+		$\beta \gets OLS(X_{train}, y_{train})$\;
+		$\tilde{y}_i^{fit} \gets \bm{X_{train}}\bm{\beta}$\;
+		$\tilde{y}_i^{predict} \gets \bm{X_{test}}\bm{\beta}$\;
+	}
+	\Return{$\bm{\beta}$, $\bm{\tilde{y}_{fit}}$, $\bm{\tilde{y}_{predict}}$}
+	\caption{The Bootstrap method of resampling}
+	\label{alg:bootstrap}
+\end{algorithm}
+
+\begin{algorithm}
+	\DontPrintSemicolon
+	\KwIn{feature matrix, $\bm{X}$, targets, $\bm{y}$, and number of folds, $k$}
+	\KwOut{model fits and predictions}
+	$\tilde{y}^{fit} \gets \mathbf{array}(k)$\;
+	$\tilde{y}^{predict} \gets \mathbf{array}(k)$\;
+	$\bm{\beta} \gets \mathbf{array}(k)$\;
+	Split $k$ folds $\bm{\mu}, \bm{\nu} \subset \bm{X}, \bm{y}$\;
+	\For{$i \gets 0$ \textbf{to} $k$}{
+		$\bm{X^{test}} \gets \bm{X}\{\mu_i\}$\;
+		$\bm{X^{train}} \gets \bm{X}\{\bm{\mu} - \mu_i\}$\;
+		$\bm{y^{test}} \gets \bm{y}\{\nu_i\}$\;
+		$\bm{y^{train}} \gets \bm{y}\{\bm{\nu} - \nu_i\}$\;
+		$\beta \gets OLS(X_{train}, y_{train})$\;
+		$\tilde{y}_i^{fit} \gets \bm{X_{train}}\bm{\beta}$\;
+		$\tilde{y}_i^{predict} \gets \bm{X_{test}}\bm{\beta}$\;
+	}
+	\Return{$\bm{beta}$, $\bm{\tilde{y}^{fit}}$, $\bm{\tilde{y}^{predict}}$}
+	\caption{k-fold Cross Validation method of resampling}
+	\label{alf:kfoldCV}
+\end{algorithm}
+
 \section{results}
 Results of study and discussion of results
 \section{conclusion}
@@ -68,6 +239,6 @@ Beyond discussion, this is actually concluding things.
 perspectives of study
 \section{appendix}
 extra material, e.g. superfluous code, tables and figures not fitting into the text itself.
-%\bibliography{\string~/Documents/bibliography/Bibliography}
+\bibliography{bib.bib}
 \end{document}
 
