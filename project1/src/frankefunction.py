@@ -11,7 +11,7 @@ from sklearn.preprocessing import StandardScaler
 def main():
     polydegree = 10; bootstraps = 100; sigma = .1
     nrows = 100; ncols = 100
-    kfolds = 10; nlambdas = 10
+    kfolds = 10; nlambdas = 1
 
     row, col, franke = makeFranke()
     #row, col, franke = makeFranke(nrows, ncols, sigma)
@@ -24,6 +24,7 @@ def main():
     kfoldCV(row, col, franke, polydegree, kfolds)
 
     ridgeRegression(row, col, franke, polydegree, nlambdas, kfolds)
+    #ridgeRegression(row, col, franke, polydegree, kfolds)
 
     return
 
@@ -138,11 +139,16 @@ def OLS(feature_matrix, targets):
     #return beta, np.diag(inverse)
     return beta
 
-def Ridge(feature_matrix, targets, lmbd):
-    #print(targets)
-    XTX = feature_matrix.T@feature_matrix
-    inverse = SVDinv( XTX + lmbd*np.identity(len(XTX)) ) 
-    return inverse @ (feature_matrix @ targets)
+#def Ridge(feature_matrix, targets, lmbd):
+#    #print(targets)
+#    XTX = feature_matrix.T@feature_matrix
+#    inverse = SVDinv( XTX + lmbd*np.identity(len(XTX)) ) 
+#    return inverse @ (feature_matrix.T @ targets)
+def Ridge(X, y, lmbd):
+    XTX = X.T @ X
+    II = np.identity(len(XTX))
+    inverse = SVDinv( XTX + lmbd*II)
+    return inverse @ (X.T @ y)
 
 def noResampling(rowdata, coldata, target, maxdegree, sigma=1):
 
@@ -305,16 +311,17 @@ def kfoldCV(rowdata, coldata, target, maxdegree, folds, sigma=1):
 
 
 def ridgeRegression(rowdata, coldata, target, maxdegree, nlambdas, folds, sigma=1):
+#def ridgeRegression(rowdata, coldata, target, maxdegree, folds, sigma=1):
     
     mse_train = []
     mse_tests = []
     
     train_indices, test_indices = split_data(target)
-    target_train = target[train_indices]
-    target_test = target[test_indices]
+    target_train = scale(target[train_indices])
+    target_test = scale(target[test_indices])
 
     foldsize = int(len(target_train)/folds)
-
+    
     lambdas = np.logspace(-5, 1, nlambdas)
 
     #write in foldsize, pick out k-fold and the rest from train_indices => np.delete(target, k-th fold) will do the trick
@@ -351,6 +358,7 @@ def ridgeRegression(rowdata, coldata, target, maxdegree, nlambdas, folds, sigma=
 
                 inverse = np.linalg.pinv(k_X_train.T @ k_X_train)
                 #beta = inverse @ (k_X_train.T @ k_target_train )
+                #beta = OLS(k_X_train, k_target_train)
                 beta = Ridge(k_X_train, k_target_train, lambdas[lmbd])
                 target_fit = k_X_train @ beta
                 target_pred = k_X_test @ beta
@@ -362,11 +370,10 @@ def ridgeRegression(rowdata, coldata, target, maxdegree, nlambdas, folds, sigma=
                 k_train.append(k_target_train)
 
 
+                mse_train.append(MSE(np.array(k_train), np.array(fits)))
+                mse_tests.append(MSE(np.array(k_tests), np.array(preds)))
 
-            mse_train.append(MSE(np.array(k_train), np.array(fits)))
-            mse_tests.append(MSE(np.array(k_tests), np.array(preds)))
-
-    plot2D(np.arange(maxdegree), [mse_train, mse_tests], ['train', 'test'], 'model complexity', 'MSE', 'Ridge')
+        #plot2D(np.arange(maxdegree), [mse_train, mse_tests], ['train', 'test'], 'model complexity', 'MSE', 'Ridge')
 
 if __name__ == '__main__':
     main()
