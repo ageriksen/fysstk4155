@@ -15,8 +15,7 @@ def main():
 
     row, col, franke = makeFranke()
 
-    ridgeRegression(row, col, franke, polydegree, nlambdas, kfolds)
-    #ridgeRegression(row, col, franke, polydegree, kfolds)
+    noResampling(row, col, franke, polydegree)
 
     return
 
@@ -68,8 +67,8 @@ def R2(target, model):
 def MSE(target, model): 
     #n = np.size(target)
     #return np.sum( (target-model)**2 )/n
-    #return np.mean( (target - model)**2 ) 
-    return np.mean( np.mean(    (target - model)**2, axis=1, keepdims=True ) )
+    return np.mean( (target - model)**2 ) 
+    #return np.mean( np.mean(    (target - model)**2, axis=1, keepdims=True ) )
 
 def BIAS2(data, model):
     return np.mean( (data - np.mean(model, axis=1, keepdims=True))**2   )
@@ -142,71 +141,50 @@ def Ridge(X, y, lmbd):
     inverse = SVDinv( XTX + lmbd*II)
     return inverse @ (X.T @ y)
 
-    
-def ridgeRegression(rowdata, coldata, target, maxdegree, nlambdas, folds, sigma=1):
-#def ridgeRegression(rowdata, coldata, target, maxdegree, folds, sigma=1):
-    
-    mse_train = []
-    mse_tests = []
-    
+def noResampling(rowdata, coldata, target, maxdegree, sigma=1):
+
+    betas = []
+    fits = []
+    preds = []
+    var_betas = []
+
+    MSEfit = np.zeros(maxdegree)
+    MSEpred =  np.zeros(maxdegree)
+    R2fit =  np.zeros(maxdegree)
+    R2pred = np.zeros(maxdegree)
+
     train_indices, test_indices = split_data(target)
     target_train = scale(target[train_indices])
     target_test = scale(target[test_indices])
+    for deg in range(maxdegree):
+        X = create_X(rowdata, coldata, deg)
 
-    foldsize = int(len(target_train)/folds)
+        X_train = scale(X[train_indices])
+        X_test = scale(X[test_indices])
+        X_train[0,:] = 1
+        X_test[0,:] = 1
+        #print(X_train)
+
+        inverse = np.linalg.pinv(X_train.T @ X_train)
+        #beta = inverse @ (X_train.T @ target_train )
+        beta = OLS(X_train, target_train)
+        target_fit = X_train @ beta
+        target_pred = X_test @ beta
+
+        betas.append(beta)
+        fits.append(target_fit)
+        preds.append(target_pred)
+        var_betas.append( sigma**2*np.diag(inverse) )
+
+        MSEfit[deg] = MSE(target_train, target_fit)
+        MSEpred[deg] = MSE(target_test, target_pred)
+        R2fit[deg] = R2(target_train, target_fit)
+        R2pred[deg] = R2(target_test, target_pred)
     
-    lambdas = np.logspace(-5, 1, nlambdas)
+    plotlist = [MSEfit, MSEpred]
+    legendlist = ['train', 'test']
+    plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', 'MSE', 'Franke function no resampling')
 
-    #write in foldsize, pick out k-fold and the rest from train_indices => np.delete(target, k-th fold) will do the trick
-
-    for lmbd in range(nlambdas):
-        for deg in range(maxdegree):
-            X = create_X(rowdata, coldata, deg)
-            fits = []; preds = []; betas = []; k_tests = []; k_train = []
-        
-            for k in range(folds):
-
-                #Might be worth it to check out np.split() as well 
-                kstart = k*foldsize
-                kstop = kstart+foldsize
-                foldindices = np.arange(kstart, kstop)
-
-                k_fold_indices = train_indices[foldindices]
-                k_train_indices = np.delete(train_indices, foldindices)
-                
-                k_target_train = target[k_train_indices]
-                k_target_test = target[k_fold_indices]
-
-                k_X_train = X[k_train_indices]
-                k_X_test = X[k_fold_indices]
-
-                mean = np.mean(k_X_train)
-                k_X_train -= mean
-                k_X_test -= mean
-                k_target_train -= mean
-                k_target_test -= mean
-                k_X_train[0,:] = 1
-                k_X_test[0,:] = 1
-
-
-                inverse = np.linalg.pinv(k_X_train.T @ k_X_train)
-                #beta = inverse @ (k_X_train.T @ k_target_train )
-                #beta = OLS(k_X_train, k_target_train)
-                beta = Ridge(k_X_train, k_target_train, lambdas[lmbd])
-                target_fit = k_X_train @ beta
-                target_pred = k_X_test @ beta
-
-                fits.append(target_fit)
-                preds.append(target_pred)
-                betas.append(beta)
-                k_tests.append(k_target_test)
-                k_train.append(k_target_train)
-
-
-                mse_train.append(MSE(np.array(k_train), np.array(fits)))
-                mse_tests.append(MSE(np.array(k_tests), np.array(preds)))
-
-        #plot2D(np.arange(maxdegree), [mse_train, mse_tests], ['train', 'test'], 'model complexity', 'MSE', 'Ridge')
 
 if __name__ == '__main__':
     main()

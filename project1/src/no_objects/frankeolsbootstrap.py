@@ -15,8 +15,8 @@ def main():
 
     row, col, franke = makeFranke()
 
-    ridgeRegression(row, col, franke, polydegree, nlambdas, kfolds)
-    #ridgeRegression(row, col, franke, polydegree, kfolds)
+    #Bootstrap(row, col, franke, polydegree, bootstraps, sigma)
+    Bootstrap(row, col, franke, polydegree, bootstraps)
 
     return
 
@@ -142,71 +142,66 @@ def Ridge(X, y, lmbd):
     inverse = SVDinv( XTX + lmbd*II)
     return inverse @ (X.T @ y)
 
-    
-def ridgeRegression(rowdata, coldata, target, maxdegree, nlambdas, folds, sigma=1):
-#def ridgeRegression(rowdata, coldata, target, maxdegree, folds, sigma=1):
-    
-    mse_train = []
-    mse_tests = []
-    
+
+def Bootstrap(rowdata, coldata, target, maxdegree, bootstraps, sigma=1):
+
+    #mse = np.zeros((bootstraps, maxdegree))
+    #err = np.zeros((bootstraps, maxdegree)) 
+    #bias= np.zeros((bootstraps, maxdegree))
+    #var = np.zeros((bootstraps, maxdegree))
+    err_train = np.zeros(maxdegree) 
+    bias_train= np.zeros(maxdegree)
+    var_train = np.zeros(maxdegree)
+    err_test = np.zeros(maxdegree) 
+    bias_test= np.zeros(maxdegree)
+    var_test = np.zeros(maxdegree)
+
+
     train_indices, test_indices = split_data(target)
-    target_train = scale(target[train_indices])
-    target_test = scale(target[test_indices])
+    target_TRAIN = scale(target[train_indices])
+    target_TEST = scale(target[test_indices])
 
-    foldsize = int(len(target_train)/folds)
-    
-    lambdas = np.logspace(-5, 1, nlambdas)
+    for deg in range(maxdegree):
+        X = create_X(rowdata, coldata, deg)
+        fits = []; preds = []; betas = []
 
-    #write in foldsize, pick out k-fold and the rest from train_indices => np.delete(target, k-th fold) will do the trick
+        for boot in range(bootstraps):
+            train_indices, test_indices = split_data(target_TRAIN)
 
-    for lmbd in range(nlambdas):
-        for deg in range(maxdegree):
-            X = create_X(rowdata, coldata, deg)
-            fits = []; preds = []; betas = []; k_tests = []; k_train = []
-        
-            for k in range(folds):
+            target_train = scale(target_TRAIN[train_indices])
+            target_test = scale(target_TRAIN[test_indices])
 
-                #Might be worth it to check out np.split() as well 
-                kstart = k*foldsize
-                kstop = kstart+foldsize
-                foldindices = np.arange(kstart, kstop)
+            X_train = scale(X[train_indices])
+            X_test = scale(X[test_indices])
+            X_train[0,:] = 1
+            X_test[0,:] = 1
 
-                k_fold_indices = train_indices[foldindices]
-                k_train_indices = np.delete(train_indices, foldindices)
-                
-                k_target_train = target[k_train_indices]
-                k_target_test = target[k_fold_indices]
+            inverse = np.linalg.pinv(X_train.T @ X_train)
+            #beta = inverse @ (X_train.T @ target_train )
+            beta = OLS(X_train, target_train)
+            target_fit = X_train @ beta
+            target_pred = X_test @ beta
 
-                k_X_train = X[k_train_indices]
-                k_X_test = X[k_fold_indices]
-
-                mean = np.mean(k_X_train)
-                k_X_train -= mean
-                k_X_test -= mean
-                k_target_train -= mean
-                k_target_test -= mean
-                k_X_train[0,:] = 1
-                k_X_test[0,:] = 1
+            fits.append(target_fit)
+            preds.append(target_pred)
+            betas.append(beta)
 
 
-                inverse = np.linalg.pinv(k_X_train.T @ k_X_train)
-                #beta = inverse @ (k_X_train.T @ k_target_train )
-                #beta = OLS(k_X_train, k_target_train)
-                beta = Ridge(k_X_train, k_target_train, lambdas[lmbd])
-                target_fit = k_X_train @ beta
-                target_pred = k_X_test @ beta
+        bias_train[deg]= BIAS2(target_train, fits)
+        var_train[deg] = VARIANCE(fits)
+        err_train[deg] = bias_train[deg] + var_train[deg]
 
-                fits.append(target_fit)
-                preds.append(target_pred)
-                betas.append(beta)
-                k_tests.append(k_target_test)
-                k_train.append(k_target_train)
+        bias_test[deg]= BIAS2(target_test, preds)
+        var_test[deg] = VARIANCE(preds)
+        err_test[deg] = bias_test[deg] + var_test[deg]
 
+    plotlist = [err_train, bias_train, var_train]
+    legendlist = ['error', 'bias^2', 'variance']
+    plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', '', 'Bootstrap Bias-Variance Franke Train')
+    plotlist = [err_test, bias_test, var_test]
+    legendlist = ['error', 'bias^2', 'variance']
+    plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', '', 'Bootstrap Bias-Variance Franke Test')
 
-                mse_train.append(MSE(np.array(k_train), np.array(fits)))
-                mse_tests.append(MSE(np.array(k_tests), np.array(preds)))
-
-        #plot2D(np.arange(maxdegree), [mse_train, mse_tests], ['train', 'test'], 'model complexity', 'MSE', 'Ridge')
 
 if __name__ == '__main__':
     main()

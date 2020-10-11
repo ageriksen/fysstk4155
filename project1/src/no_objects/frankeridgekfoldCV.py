@@ -14,7 +14,6 @@ def main():
     kfolds = 10; nlambdas = 1
 
     row, col, franke = makeFranke()
-
     ridgeRegression(row, col, franke, polydegree, nlambdas, kfolds)
     #ridgeRegression(row, col, franke, polydegree, kfolds)
 

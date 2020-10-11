@@ -15,8 +15,7 @@ def main():
 
     row, col, franke = makeFranke()
 
-    ridgeRegression(row, col, franke, polydegree, nlambdas, kfolds)
-    #ridgeRegression(row, col, franke, polydegree, kfolds)
+    kfoldCV(row, col, franke, polydegree, kfolds)
 
     return
 
@@ -143,8 +142,7 @@ def Ridge(X, y, lmbd):
     return inverse @ (X.T @ y)
 
     
-def ridgeRegression(rowdata, coldata, target, maxdegree, nlambdas, folds, sigma=1):
-#def ridgeRegression(rowdata, coldata, target, maxdegree, folds, sigma=1):
+def kfoldCV(rowdata, coldata, target, maxdegree, folds, sigma=1):
     
     mse_train = []
     mse_tests = []
@@ -154,59 +152,52 @@ def ridgeRegression(rowdata, coldata, target, maxdegree, nlambdas, folds, sigma=
     target_test = scale(target[test_indices])
 
     foldsize = int(len(target_train)/folds)
-    
-    lambdas = np.logspace(-5, 1, nlambdas)
 
     #write in foldsize, pick out k-fold and the rest from train_indices => np.delete(target, k-th fold) will do the trick
+    #should the scaling be per k-fold training set, or should it be done early? 
 
-    for lmbd in range(nlambdas):
-        for deg in range(maxdegree):
-            X = create_X(rowdata, coldata, deg)
-            fits = []; preds = []; betas = []; k_tests = []; k_train = []
+    for deg in range(maxdegree):
+        X = create_X(rowdata, coldata, deg)
+        fits = []; preds = []; betas = []; k_tests = []; k_train = []
+    
         
-            for k in range(folds):
 
-                #Might be worth it to check out np.split() as well 
-                kstart = k*foldsize
-                kstop = kstart+foldsize
-                foldindices = np.arange(kstart, kstop)
+        for k in range(folds):
 
-                k_fold_indices = train_indices[foldindices]
-                k_train_indices = np.delete(train_indices, foldindices)
-                
-                k_target_train = target[k_train_indices]
-                k_target_test = target[k_fold_indices]
+            kstart = k*foldsize
+            kstop = kstart+foldsize
+            foldindices = np.arange(kstart, kstop)
 
-                k_X_train = X[k_train_indices]
-                k_X_test = X[k_fold_indices]
+            k_fold_indices = train_indices[foldindices]
+            k_train_indices = np.delete(train_indices, foldindices)
+            
+            k_target_train = target[k_train_indices]
+            k_target_test = target[k_fold_indices]
 
-                mean = np.mean(k_X_train)
-                k_X_train -= mean
-                k_X_test -= mean
-                k_target_train -= mean
-                k_target_test -= mean
-                k_X_train[0,:] = 1
-                k_X_test[0,:] = 1
+            k_X_train = scale(X[k_train_indices])
+            k_X_test = scale(X[k_fold_indices])
+            k_X_train[0,:] = 1
+            k_X_test[0,:] = 1
 
+            inverse = np.linalg.pinv(k_X_train.T @ k_X_train)
+            #beta = inverse @ (k_X_train.T @ k_target_train )
+            beta = OLS(k_X_train, k_target_train)
+            target_fit = k_X_train @ beta
+            target_pred = k_X_test @ beta
 
-                inverse = np.linalg.pinv(k_X_train.T @ k_X_train)
-                #beta = inverse @ (k_X_train.T @ k_target_train )
-                #beta = OLS(k_X_train, k_target_train)
-                beta = Ridge(k_X_train, k_target_train, lambdas[lmbd])
-                target_fit = k_X_train @ beta
-                target_pred = k_X_test @ beta
-
-                fits.append(target_fit)
-                preds.append(target_pred)
-                betas.append(beta)
-                k_tests.append(k_target_test)
-                k_train.append(k_target_train)
+            fits.append(target_fit)
+            preds.append(target_pred)
+            betas.append(beta)
+            k_tests.append(k_target_test)
+            k_train.append(k_target_train)
 
 
-                mse_train.append(MSE(np.array(k_train), np.array(fits)))
-                mse_tests.append(MSE(np.array(k_tests), np.array(preds)))
 
-        #plot2D(np.arange(maxdegree), [mse_train, mse_tests], ['train', 'test'], 'model complexity', 'MSE', 'Ridge')
+        mse_train.append(MSE(np.array(k_train), np.array(fits)))
+        mse_tests.append(MSE(np.array(k_tests), np.array(preds)))
+
+    plot2D(np.arange(maxdegree), [mse_train, mse_tests], ['train', 'test'], 'model complexity', 'MSE')
+
 
 if __name__ == '__main__':
     main()
