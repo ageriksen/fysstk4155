@@ -36,6 +36,19 @@ class OLS(__Regressor):
 
         self.y_fit = self.X_train @ self.beta
         
-        self.MSE = np.mean( (y_train - self.y_fit)**2 )
+        self.MSEtrain = np.mean( (self.y_train - self.y_fit)**2 )
+
+    def predict(self, X_test, y_test):
+        self.X_test = X_test; self.y_test = y_test
+
+        self.y_pred = self.X_test @ self.beta
+
+        self.MSEtest = np.mean( (self.y_test - self.y_pred)**2 ) 
         
-        
+    def get_data(self):
+        return {
+                'beta': self.beta,
+                'y_fit': self.y_fit,
+                'MSEtrain': self.MSEtrain,
+                'MSEtest': self.MSEtest
+                }

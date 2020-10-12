@@ -9,9 +9,8 @@ np.random.seed(2020)
 from sklearn.preprocessing import StandardScaler
 
 def main():
-    polydegree = 10; bootstraps = 100; sigma = .1
-    nrows = 100; ncols = 100
-    kfolds = 10; nlambdas = 1
+    polydegree = 10; sigma = .1
+    nrows = 100; ncols = 200 
 
     row, col, franke = makeFranke()
 
@@ -181,8 +180,8 @@ def noResampling(rowdata, coldata, target, maxdegree, sigma=1):
         R2fit[deg] = R2(target_train, target_fit)
         R2pred[deg] = R2(target_test, target_pred)
     
-    plotlist = [MSEfit, MSEpred]
-    legendlist = ['train', 'test']
+    plotlist = [MSEfit]#, MSEpred]
+    legendlist = ['train']#, 'test']
     plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', 'MSE', 'Franke function no resampling')
 
 

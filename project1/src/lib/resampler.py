@@ -15,21 +15,23 @@ from lib.traintest import TrainTest
 
 class NoResample:
 
-    def __init__(self, regressor, designmatrix, inputs, targets):
+    def __init__(self, regressor, designmatrix, row, col, targets):
         self.regressor = regressor
         self.designmatrix = designmatrix
-        self.inputs = inputs
+        self.row = row
+        self.col = col
         self.targets = targets
 
 
 
-    def validate(self, polydegree, test_ratio=0.2):
+    def run(self, polydegree, test_ratio=0.2):
 
-        X = self.designmatrix(self.inputs[0], self.inputs[1], polydegree)
+        X = self.designmatrix(self.row, self.col, polydegree)
 
         traintest = TrainTest()
         traintest.indices(self.targets)
         X_train, X_test, y_train, y_test = traintest.split(X, self.targets)
 
         self.regressor.fit(X_train, y_train)
+        self.regressor.predict(X_test, y_test)
 
