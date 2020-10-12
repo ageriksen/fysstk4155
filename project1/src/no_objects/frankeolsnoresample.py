@@ -9,10 +9,11 @@ np.random.seed(2020)
 from sklearn.preprocessing import StandardScaler
 
 def main():
-    polydegree = 10; sigma = .1
-    nrows = 100; ncols = 200 
+    polydegree = 10; bootstraps = 100; sigma = 1
+    nrows = 100; ncols = 200
+    kfolds = 10; nlambdas = 1
 
-    row, col, franke = makeFranke()
+    row, col, franke = makeFranke(nrows, ncols, sigma)
 
     noResampling(row, col, franke, polydegree)
 
@@ -115,7 +116,7 @@ def makeFranke(rows=100, cols=200, sigma=1):
 
     franke = FrankeFunction(row_mat, col_mat) \
             +   sigma*np.random.randn(rows,cols)
-    #plot3D(row_mat, col_mat, franke)
+    plot3D(row_mat, col_mat, franke)
     return row_mat.ravel(), col_mat.ravel(), franke.ravel()
 
 def SVDinv(matrix):
@@ -180,8 +181,8 @@ def noResampling(rowdata, coldata, target, maxdegree, sigma=1):
         R2fit[deg] = R2(target_train, target_fit)
         R2pred[deg] = R2(target_test, target_pred)
     
-    plotlist = [MSEfit]#, MSEpred]
-    legendlist = ['train']#, 'test']
+    plotlist = [MSEfit, MSEpred]
+    legendlist = ['train', 'test']
     plot2D(np.arange(maxdegree), plotlist, legendlist, 'model complexity', 'MSE', 'Franke function no resampling')
 
 
