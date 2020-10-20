@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import numpy as np
 
 class _baseregressor:
 
@@ -14,7 +15,7 @@ class OLS(_baseregressor):
     def __init__(self):
         self
 
-    def fit(self):
+    def fit(self, X, y):
         covar = svdinv( X.T @ X )
         self.beta = covar @ (X.T @ y)
         return self.beta
