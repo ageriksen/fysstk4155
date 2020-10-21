@@ -93,6 +93,12 @@ def RunFranke(rows, cols, sigma):
     print("OLS beta, train, test:")
     print(beta,"\n", predictTrain,"\n", predictTest)
     print("*"*25)
+    print("OO OLS beta, train, test:")
+    print(OObeta,"\n", OOpredTrain,"\n", OOpredTest)
+    print("*"*25)
+    print("Gradient descent beta, train, test:")
+    print(SGbeta,"\n", SGpredTrain,"\n", SGpredTest)
+    print("*"*25)
     
 
 
