@@ -6,8 +6,10 @@ import lib.gradientdescent as gd
 import numpy as np
 
 def main():
-    rows = 100; cols = 100; sigma = 0.1
-    RunFranke(rows, cols, sigma)
+    #rows = 100; cols = 100; sigma = 0.1
+    #RunFranke(rows, cols, sigma)
+    dtpts = 100
+    RunSimpleExample(dtpts)
 
 def FrankeFunction(x,y):
     term1 = 0.75*np.exp(               
@@ -54,6 +56,32 @@ def TrainTestSplit(data, test_ratio=.2):
     train = shuffle[test_size:]
     return train,test
 
+def RunSimpleExample(dtpts):
+    from sklearn.linear_model import SGDRegressor
+    x = np.random.rand(dtpts,1) # random col matrix of positions
+    y = 4 + 3*x*np.random.randn(dtpts,1) # polynomial with noise 
+
+    X = np.c_[np.ones((dtpts, 1)), x] # feature matrix w bias and inputs
+    
+    print("="*50, "\nBeta's:")
+    #Theta is the common nomenclature for optimization params. 
+    theta_ols = np.linalg.pinv( X.T@X ) @ ( X.T@y )
+    print("ols theta\n", theta_ols)
+    #skl
+    sklreg = SGDRegressor(max_iter=50, penalty=None, eta0=0.1)
+    sklreg.fit(x, y.ravel())
+    print("skl regr.\n", sklreg.intercept_, sklreg.coef_)
+    #SGD
+    lrnrt = 0.01
+    maxiter = 1e5
+    grad = gd.SGD(lrnrt)
+    SGDBeta = grad.FindBeta(X,y.ravel(), maxiter)
+    print("own GD\n", SGDBeta)
+    print("="*50)
+    
+
+
+
 def RunFranke(rows, cols, sigma):
     #setup data
     row = np.linspace(0,1,rows)
@@ -73,16 +101,10 @@ def RunFranke(rows, cols, sigma):
     featuresTrain=features[train]
     featuresTest=features[test]
 
-    beta = np.linalg.pinv(featuresTrain.T @ featuresTrain)\
-            @ (featuresTrain.T @ heightTrain)
-
-    predictTrain = featuresTrain@beta
-    predictTest = featuresTest@beta
-
     ols = reg.OLS()   
-    OObeta = ols.fit(featuresTrain, heightTrain)
-    OOpredTrain = ols.predict(featuresTrain)
-    OOpredTest = ols.predict(featuresTest)
+    olsbeta = ols.fit(featuresTrain, heightTrain)
+    olspredTrain = ols.predict(featuresTrain)
+    olspredTest = ols.predict(featuresTest)
 
     learningrate = 0.001
     gradient = gd.SGD(learningrate)
@@ -91,16 +113,15 @@ def RunFranke(rows, cols, sigma):
     SGpredTest = featuresTest@SGbeta
 
     print("OLS beta, train, test:")
-    print(beta,"\n", predictTrain,"\n", predictTest)
-    print("*"*25)
-    print("OO OLS beta, train, test:")
-    print(OObeta,"\n", OOpredTrain,"\n", OOpredTest)
+    print(olsbeta,"\n", olspredTrain,"\n", olspredTest)
     print("*"*25)
     print("Gradient descent beta, train, test:")
     print(SGbeta,"\n", SGpredTrain,"\n", SGpredTest)
     print("*"*25)
+    print("difference beta")
+    print(olsbeta - SGbeta)
+    print("*"*25)
     
-
 
 
 if __name__ == "__main__":
