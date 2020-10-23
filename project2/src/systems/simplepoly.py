@@ -3,6 +3,7 @@ import lib.regressor as reg
 import lib.gradientdescent as gd
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 class SimpleRegression:
 
@@ -40,3 +41,11 @@ class SimpleRegression:
         print("own SGD\n", SGDBeta)
 
         print("="*50)
+        
+        plt.figure()
+        plt.plot(x, y, label="y")
+        plt.plot(x, X@theta_ols, label="ols fit")
+        plt.plot(x, X@GDBeta, label="GD fit")
+        plt.plot(x, X@SGDBeta, label="SGD fit")
+        plt.legend()
+        plt.show()
