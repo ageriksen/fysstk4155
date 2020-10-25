@@ -10,19 +10,17 @@ import numpy as np
 
 
 def main():
-    #rows = 100; cols = 100; sigma = 0.1
+    rows = 100; cols = 100; sigma = 0.1
     #RunFranke(rows, cols, sigma)
-    #franke = frnk.FrankeRegression()
-    #franke.RunFranke(rows, cols, sigma
-    dtpts = 100
-    simple = smpl.SimpleRegression()
-    simple.RunSimpleExample(dtpts)
+    franke = frnk.FrankeRegression()
+    franke.RunFranke(rows, cols, sigma)
+
+    #dtpts = 100
+    #simple = smpl.SimpleRegression()
+    #simple.RunSimpleExample(dtpts)
 
 
     
-
-    
-
 
 if __name__ == "__main__":
     main()
