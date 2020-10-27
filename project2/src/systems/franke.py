@@ -101,31 +101,33 @@ class FrankeRegression(_RegressionBase):
         #section and input the eventual other parameters in the
         #regressor case, either through passing **kwargs or *args
         #to generalize the process. 
-        degree = 5
-        features = self.PolyFeatures(row, col, degree)
-        testRatio = .2
-        train, test = self.TrainTestSplit(height,testRatio)
-        heightTrain=height[train]
-        heightTest=height[test]
-        featuresTrain=features[train]
-        featuresTest=features[test]
 
-        ols = reg.OLS()   
-        olsbeta = ols.fit(featuresTrain, heightTrain)
-        olspredTrain = ols.predict(featuresTrain)
-        olspredTest = ols.predict(featuresTest)
+        maxdegree = 10
+        for deg in range(maxdegree):
+            features = self.PolyFeatures(row, col, deg)
+            testRatio = .2
+            train, test = self.TrainTestSplit(height,testRatio)
+            heightTrain=height[train]
+            heightTest=height[test]
+            featuresTrain=features[train]
+            featuresTest=features[test]
 
-        learningrate = 0.001 #should be input somewhere in the call
-        print("Xtrain.shape: ", featuresTrain.shape)
-        print("="*100)
-        gradient = gd.SGD(learningrate)
-        SGbeta = gradient.FindBeta(featuresTrain, heightTrain)
-        SGpredTrain = featuresTrain@SGbeta
-        SGpredTest = featuresTest@SGbeta
+            ols = reg.OLS()   
+            olsbeta = ols.fit(featuresTrain, heightTrain)
+            olspredTrain = ols.predict(featuresTrain)
+            olspredTest = ols.predict(featuresTest)
 
-        print("OLS beta, train, test:\n",olsbeta,"\n", olspredTrain,"\n", olspredTest)
-        print("*"*25)
-        print("SGD beta, train, test:\n",SGbeta,"\n", SGpredTrain,"\n", SGpredTest)
-        print("*"*25)
-        print("difference beta\n",olsbeta - SGbeta)
-        print("*"*25)
+            #learningrate = 0.001 #should be input somewhere in the call IF it's GD. w/ SGD, use learning schedule.
+            minibatches = 10
+            epochs = 50
+            gradient = gd.SGD(minibatches, epochs)
+            SGbeta = gradient.FindBeta(featuresTrain, heightTrain)
+            SGpredTrain = featuresTrain@SGbeta
+            SGpredTest = featuresTest@SGbeta
+
+            #print("OLS beta, train, test:\n",olsbeta,"\n", olspredTrain,"\n", olspredTest)
+            #print("*"*25)
+            #print("SGD beta, train, test:\n",SGbeta,"\n", SGpredTrain,"\n", SGpredTest)
+            #print("*"*25)
+            #print("difference beta\n",olsbeta - SGbeta)
+            #print("*"*25)

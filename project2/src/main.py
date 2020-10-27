@@ -10,6 +10,7 @@ import numpy as np
 
 
 def main():
+    np.random.seed(2020)
     rows = 100; cols = 100; sigma = 0.1
     #RunFranke(rows, cols, sigma)
     franke = frnk.FrankeRegression()
