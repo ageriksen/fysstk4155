@@ -20,13 +20,13 @@ class SGD(_gradientDescent):
     def __init__(self, minibatches, epochs, *args):
         super().__init__(*args)
         self.epochs = epochs #need to configure setting epochs.
-        self.t0, self.t1 = 5, 50 #for varying learningrate as we go. need to implement setting.
+        self.t0, self.t1 = 5, 50 #for varying learningrate as we go.
+                                #to implement setting variable
         self.minibatches = minibatches
 
     def lrnschdl(self, t): return self.t0 / (t + self.t1)
 
-    def FindBeta(self,X,y):
-        beta = np.zeros(X.shape[1])#.reshape((X.shape[1],1))
+    def fit(self, X, y):
         self.null = False
         batchsize = int(y.shape[0]/self.minibatches)
         theta = np.random.randn(X.shape[1], batchsize)

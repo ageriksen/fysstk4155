@@ -52,8 +52,8 @@ class FrankeRegression(_RegressionBase):
     values, x,y,z coordinates and such. 
     """
 
-    def __init__(self):
-        self
+    def __init__(self, regressor, **kwargs):
+        self.regressor = regressor(**kwargs)
 
     def FrankeFunction(self, x,y):
         #This definitely belongs in the Franke function class. 
@@ -76,8 +76,7 @@ class FrankeRegression(_RegressionBase):
 
         return term1 + term2 + term3 + term4
 
-
-    def RunFranke(self, rows, cols, sigma):
+    def Set(self, rows, cols, sigma): 
         ########################################
         #setup data - Should maybe be it's own method
         #And have a second "run" or "regress" method for
@@ -87,47 +86,25 @@ class FrankeRegression(_RegressionBase):
         #e.g. OLS, Ridge, SGD, etc. 
         row = np.linspace(0,1,rows)
         col = np.linspace(0,1,cols)
-        row_mat, col_mat = np.meshgrid(col, row)
-        height_mat = self.FrankeFunction(row_mat, col_mat)
-        row = row_mat.ravel()
-        col = col_mat.ravel()
-        height = height_mat.ravel()
+        self.row_mat, self.col_mat = np.meshgrid(col, row)
+        self.height_mat = self.FrankeFunction(self.row_mat, self.col_mat)
+        self.row = self.row_mat.ravel()
+        self.col = self.col_mat.ravel()
+        self.height = self.height_mat.ravel()
         #This is mostly the specific case for Franke. 
         #Below is mainly usage of imported classes.
         ########################################
 
-        #The polynomial degree should be varied. If possible,
-        #probably easiest to have the model complexity in this
-        #section and input the eventual other parameters in the
-        #regressor case, either through passing **kwargs or *args
-        #to generalize the process. 
+    def Run(self, testRatio=.2, maxdegree=10):
 
-        maxdegree = 10
-        for deg in range(maxdegree):
-            features = self.PolyFeatures(row, col, deg)
-            testRatio = .2
-            train, test = self.TrainTestSplit(height,testRatio)
-            heightTrain=height[train]
-            heightTest=height[test]
+        for deg in range(1, maxdegree):
+            features = self.PolyFeatures(self.row, self.col, deg)
+            train, test = self.TrainTestSplit(self.height,testRatio)
+            heightTrain=self.height[train]
+            heightTest=self.height[test]
             featuresTrain=features[train]
             featuresTest=features[test]
 
-            ols = reg.OLS()   
-            olsbeta = ols.fit(featuresTrain, heightTrain)
-            olspredTrain = ols.predict(featuresTrain)
-            olspredTest = ols.predict(featuresTest)
-
-            #learningrate = 0.001 #should be input somewhere in the call IF it's GD. w/ SGD, use learning schedule.
-            minibatches = 10
-            epochs = 50
-            gradient = gd.SGD(minibatches, epochs)
-            SGbeta = gradient.FindBeta(featuresTrain, heightTrain)
-            SGpredTrain = featuresTrain@SGbeta
-            SGpredTest = featuresTest@SGbeta
-
-            #print("OLS beta, train, test:\n",olsbeta,"\n", olspredTrain,"\n", olspredTest)
-            #print("*"*25)
-            #print("SGD beta, train, test:\n",SGbeta,"\n", SGpredTrain,"\n", SGpredTest)
-            #print("*"*25)
-            #print("difference beta\n",olsbeta - SGbeta)
-            #print("*"*25)
+            SGDbeta = self.regressor.fit(featuresTrain, heightTrain)
+            SGDpredTrain = featuresTrain@SGDbeta
+            SGDpredTest = featuresTest@SGDbeta
