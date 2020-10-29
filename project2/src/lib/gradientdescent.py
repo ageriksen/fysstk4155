@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from tqdm import tqdm
 import numpy as np
+from tqdm import tqdm
 
 class _gradientDescent:
     def __init__(self):
@@ -30,7 +30,7 @@ class SGD(_gradientDescent):
         self.null = False
         batchsize = int(y.shape[0]/self.minibatches)
         theta = np.random.randn(X.shape[1], batchsize)
-        for epoch in tqdm(range(self.epochs)):
+        for epoch in range(self.epochs):
             for i in range(self.minibatches):
                 rand = np.random.randint(self.minibatches)
                 batch = rand*batchsize
@@ -41,10 +41,10 @@ class SGD(_gradientDescent):
                 theta -= eta*gradients
             if self.null:
                 print("found a 0")
-                self.betaBest = theta
-                return self.betaBest
-        self.betaBest = theta
-        return self.betaBest
+                self.theta = theta
+                return self.theta
+        self.theta = theta
+        #return self.theta
         
 class GD(_gradientDescent):
 
@@ -62,7 +62,7 @@ class GD(_gradientDescent):
             betaOld = beta
             beta = self.betaNew(X,y,betaOld)
             if self.null:
-                self.betaBest = beta
-                return self.betaBest
-        self.betaBest = beta
-        return self.betaBest
+                self.theta = beta
+                return self.theta
+        self.theta = beta
+        return self.theta
