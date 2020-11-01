@@ -21,7 +21,7 @@ class SGD(_gradientDescent):
         super().__init__(*args)
         self.epochs = epochs #need to configure setting epochs.
         self.t0, self.t1 = 5, 50 #for varying learningrate as we go.
-                                #to implement setting variable
+                                #TODO implement setting t0 and t1
         self.minibatches = minibatches
 
     def lrnschdl(self, t): return self.t0 / (t + self.t1)
@@ -29,15 +29,15 @@ class SGD(_gradientDescent):
     def fit(self, X, y):
         self.null = False
         batchsize = int(y.shape[0]/self.minibatches)
-        theta = np.random.randn(X.shape[1], batchsize)
+        theta = np.random.randn(X.shape[1])
         for epoch in range(self.epochs):
-            for i in range(self.minibatches):
+            for batch in range(self.minibatches):
                 rand = np.random.randint(self.minibatches)
                 batch = rand*batchsize
                 Xi = X[batch:batch+batchsize]
                 yi = y[batch:batch+batchsize]
                 gradients = self.gradient(Xi, yi, theta) 
-                eta = self.lrnschdl(epoch*y.shape[0]+1) #the y.shape here is the minibatch and should really be declared at some point
+                eta = self.lrnschdl(epoch*self.minibatches+batch) #the y.shape here is the minibatch and should really be declared at some point
                 theta -= eta*gradients
             if self.null:
                 print("found a 0")

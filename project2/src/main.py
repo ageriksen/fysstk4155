@@ -11,10 +11,10 @@ import numpy as np
 
 def main():
     np.random.seed(2020)
-    rows = 100; cols = 100; sigma = 0.1
-    maxdegree = 10; testRatio=.2
+    rows = 100; cols = 100; sigma = 1
+    maxdegree = 15; testRatio=.2
 
-    franke = frnk.FrankeRegression(gd.SGD, epochs=50, minibatches=10)
+    franke = frnk.FrankeRegression(gd.SGD, epochs=500, minibatches=100)
     franke.Set(rows, cols, sigma) 
     franke.Run( testRatio, maxdegree )
 

@@ -2,8 +2,10 @@ To Do's Project 2
 ---
 
 1   writing SGD code, first step:
-*   scikitlearn solutions for ridge and ols
-*   implement mse, r2 etc. for SGD 
+*   scikitlearn solutions for 
+	*	~~ols~~
+	*	ridge 
+*   ~~implement mse, r2 etc. for SGD~~
 *   analyse performance SGD as func of
     *   learningrate
     *   number of minibatches
@@ -17,3 +19,11 @@ To Do's Project 2
 
 #misc
 *	Need to add containment on properties in gradient descent
+
+
+Done
+---
+1   writing SGD code, first step:
+*   scikitlearn solutions for 
+	*	ols
+*   implement mse, r2 etc. for SGD 

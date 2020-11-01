@@ -3,9 +3,11 @@ import lib.regressor as reg
 import lib.gradientdescent as gd
 
 import sklearn.linear_model as skl
+from sklearn.metrics import mean_squared_error
 
 import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 class _FrankeBaseRegressor:
 
@@ -30,6 +32,17 @@ class _FrankeBaseRegressor:
                 for k in range(i+1):
                         X[:,q+k] = (x**(i-k))*(y**k)
         return X
+
+
+    def R2(self, target, model):
+        return 1 - ( np.sum( (target-model)**2 )/np.sum( (target-np.mean(target))**2 ) )
+
+    def singleMSE(self, target, model): 
+        return np.mean( (target - model)**2 ) 
+
+    def multiMSE(self, target, model):
+        assert model.shape[1] > 1, "use the single version instead"
+        return np.mean( np.mean(    (target - model)**2, axis=1, keepdims=True ) )
 
     def TrainTestSplit(self, data, test_ratio=.2):
         """
@@ -81,10 +94,15 @@ class FrankeRegression(_FrankeBaseRegressor):
 
         regtrain = []
         regtest = []
+        regR2 = []
+        regTrainMSE = []
+        regTestMSE = []
+
         skltrain = []
         skltest = []
         sklR2 = []
-        sklMSE = []
+        sklTrainMSE = []
+        sklTestMSE = []
         
         for deg in tqdm(range(1, maxdegree)):
 
@@ -100,11 +118,24 @@ class FrankeRegression(_FrankeBaseRegressor):
             sklmodel.predict(featuresTrain)
             skltrain.append(sklmodel.predict(featuresTrain))
             skltest.append(sklmodel.predict(featuresTest))
-            sklR2.append(sklmodel.score(heightTest, sklmodel.predict(featuresTest)))
+            sklR2.append(sklmodel.score(featuresTest, heightTest))
+            sklTrainMSE.append(mean_squared_error(heightTrain, skltrain[-1]))
+            sklTestMSE.append(mean_squared_error(heightTest, skltest[-1]))
 
             self.regressor.fit(featuresTrain, heightTrain)
             regtrain.append(featuresTrain@self.regressor.theta)
-            print(type(featuresTrain@self.regressor.theta), flush=True)
-            regtest.append(featuresTrain@self.regressor.theta)
+            regtest.append(featuresTest@self.regressor.theta)
+            regR2.append(self.R2(heightTest, regtest[-1]))
+            regTrainMSE.append(self.singleMSE(heightTrain, regtrain[-1]))
+            regTestMSE.append(self.singleMSE(heightTest, regtest[-1]))
 
-        
+        degrees = np.arange(1, maxdegree)
+        print("degrees:\n", degrees)
+        plt.plot(degrees, sklTrainMSE, label='skl train')
+        plt.plot(degrees, sklTestMSE, label='skl test')
+        #plt.plot(degrees, regTrainMSE, label='SGD train')
+        #plt.plot(degrees, regTestMSE, label='SGD test')
+        plt.legend()
+        plt.xlabel('model complexity')
+        plt.ylabel('MSE')
+        plt.show()
