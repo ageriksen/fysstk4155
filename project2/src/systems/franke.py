@@ -9,7 +9,7 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-class _FrankeBaseRegressor:
+class _BaseFrankeRegressor:
 
     def __init__(self):
         self.setup = False
@@ -80,7 +80,7 @@ class _FrankeBaseRegressor:
         self.setup = True
 
 
-class FrankeRegression(_FrankeBaseRegressor):
+class FrankeRegression(_BaseFrankeRegressor):
     """
     class for performing Linear regression on the Franke function.
     I think the specific regressor(OLS, SGD, etc.) should be made 
