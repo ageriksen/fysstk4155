@@ -16,6 +16,7 @@ def main():
     maxdegree = 20; testRatio=.2
 
     franke = frnk.FrankeRegression()
+    franke.SetResampler("None")
     franke.SetRegressor(gd.SGD, epochs=100, minibatches=100)
     franke.SetSklRegressor(skl.LinearRegression)
     franke.SetSystem(rows, cols, sigma) 
