@@ -2,8 +2,7 @@ Project 2, NNs and SGD
 ---
 >	work in progress
 
-#Structure
-
+#	Structure
 The code lies in the `src` folder, with a `main.py` script which 
 calls the systems, e.g. linear regression with the Franke function
 which lie in the `systems` folder, with the named systems within. 
