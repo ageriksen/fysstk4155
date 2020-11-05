@@ -1,6 +1,16 @@
 To Do's Project 2
 ---
 
+###	after speaking with TA
+*	The point of this is a benchmark. Setup a rel. difference with 
+	beta produced, cehck for 
+	*	Epochs
+	*	minibatches
+	*	learningrate 
+	*	learningschedule
+	Then move on
+
+### project description
 1   writing SGD code, first step:
 *   scikitlearn solutions for 
 	*	~~ols~~
