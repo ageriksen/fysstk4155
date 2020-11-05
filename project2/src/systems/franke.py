@@ -3,6 +3,7 @@ import lib.regressor as reg
 import lib.gradientdescent as gd
 
 import sklearn.linear_model as skl
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 
 import numpy as np
@@ -92,8 +93,21 @@ class FrankeRegression(_BaseFrankeRegressor):
     def __init__(self):
         self.regressor = None
         self.sklregressor = None
+        self.hyperParameters = {'None': self.NoHypers}
+        self.models = {'polynomial': self.PolyNomialModel}
         self.resamplers = {'None': self.NoResample}
+        self.hyperParameter = None
+        self.modelComplexity = None
         self.resampler = None
+        self.testRatio = .2
+
+    def SetHyperParameter(self, hyper, **kwargs):
+        assert hyper in self.hyperParameters, hyper + " not implemented"
+        self.hyperParameter = self.hyperParameters[hyper]
+
+    def SetModelComplexity(self, model, **kwargs):
+        assert model in self.models, model + " not implemented"
+        self.modelComplexity = self.models[model]
 
     def SetResampler(self, resampler, **kwargs):
         assert resampler in self.resamplers, resampler + " not implemented"
@@ -106,85 +120,40 @@ class FrankeRegression(_BaseFrankeRegressor):
         self.sklregressor = sklregressor(**kwargs)
 
     def Run(self,  testRatio=.2, maxdegree=10):
-        assert self.setup, "You need to setup the system!"
+        assert self.hyperParameter is not None, "please set hyperparameters"
+        assert self.modelComplexity is not None, "please set model complexity"
+        assert self.resampler is not None, "resampling method not set"
         assert self.regressor is not None, "Regressor not set"
         assert self.sklregressor is not None, "skl regressor not set"
-        assert self.resampler is not None, "resampling method not set"
+        assert self.setup, "You need to setup the system!"
 
-        self.regtrain        =   []
-        self.regtest         =   []
-        self.regR2           =   []
-        self.regTrainMSE     =   []
-        self.regTestMSE      =   []
+        self.maxdegree = maxdegree
+        self.sklTheta = []; self.SGDTheta = []
 
-        self.skltrain        =   []
-        self.skltest         =   []
-        self.sklR2           =   []
-        self.sklTrainMSE     =   []
-        self.sklTestMSE      =   []
+        self.hyperParameter()
 
-        for deg in tqdm(range(1, maxdegree)):
+        self.relldiff = np.zeros(self.maxdegree)
+        for i in range(self.maxdegree):
+            self.relldiff[i] = np.mean((self.sklTheta[i]-self.SGDTheta[i])**2)
 
+    def NoHypers(self):
+        self.modelComplexity()
+
+    def PolyNomialModel(self):
+        for deg in tqdm(range(1, self.maxdegree+1)):
             features = self.PolyFeatures(self.row, self.col, deg)
+            self.resampler(features)
 
-            #TODO   The feature matrix is the only thing needing to be
-            #       set in this instance. eventual hyperparameters and
-            #       resampling could be set before and after this section
+    def NoResample(self, features):
+            train, test = self.TrainTestSplit(self.height,self.testRatio)
+            heightTrain = self.height[train]; heightTest = self.height[test]
+            featuresTrain = features[train]; featuresTest = features[test]
 
-            self.resampler(features, testRatio)
-
-
-        self.regtrain        =   np.array(   regtrain        )
-        self.regtest         =   np.array(   regtest         )
-        self.regR2           =   np.array(   regR2           )
-        self.regTrainMSE     =   np.array(   regTrainMSE     )
-        self.regTestMSE      =   np.array(   regTestMSE      )
-        self.skltrain        =   np.array(   skltrain        )
-        self.skltest         =   np.array(   skltest         )
-        self.sklR2           =   np.array(   sklR2           )
-        self.sklTrainMSE     =   np.array(   sklTrainMSE     )
-        self.sklTestMSE      =   np.array(   sklTestMSE      )
-
-
-        degrees = np.arange(1, maxdegree)
-        plt.plot(degrees, self.sklTrainMSE, label='skl train')
-        plt.plot(degrees, self.sklTestMSE, label='skl test')
-        plt.plot(degrees, self.regTrainMSE, label='SGD train')
-        plt.plot(degrees, self.regTestMSE, label='SGD test')
-        plt.legend()
-        plt.xlabel('model complexity')
-        plt.ylabel('MSE')
-        plt.show()
-
-
-    def NoResample(self, features, testRatio):
-
-            train, test = self.TrainTestSplit(self.height,testRatio)
-
-            heightTrain     =   self.height[train]
-            heightTest      =   self.height[test]
-
-            featuresTrain   =   features[train]
-            featuresTest    =   features[test]
-
-            #TODO normalize features and targets
-
+            scaler = StandardScaler().fit(featuresTrain)
+            featuresTrain = scaler.transform(featuresTrain); featuresTest = scaler.transform(featuresTest)
             #
             self.sklregressor.fit(featuresTrain, heightTrain)
-
-            self.skltrain.append(self.sklregressor.predict(featuresTrain))
-            self.skltest.append(self.sklregressor.predict(featuresTest))
-            
-            self.sklR2.append(self.sklregressor.score(featuresTest, heightTest))
-            self.sklTrainMSE.append(mean_squared_error(heightTrain, self.skltrain[-1]))
-            self.sklTestMSE.append(mean_squared_error(heightTest, self.skltest[-1]))
-
+            self.sklTheta.append(self.sklregressor.coef_)
             #
             self.regressor.fit(featuresTrain, heightTrain)
-
-            self.regtrain.append(featuresTrain@self.regressor.theta)
-            self.regtest.append(featuresTest@self.regressor.theta)
-
-            self.regR2.append(self.R2(heightTest, self.regtest[-1]))
-            self.regTrainMSE.append(self.singleMSE(heightTrain, self.regtrain[-1]))
-            self.regTestMSE.append(self.singleMSE(heightTest, self.regtest[-1]))
+            self.SGDTheta.append(self.regressor.theta)

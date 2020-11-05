@@ -15,13 +15,21 @@ def main():
     rows = 100; cols = 50; sigma = 1
     maxdegree = 20; testRatio=.2
 
+    learningrates = np.linspace(0.01, 0.1, 10)
+    epochs = np.arange(10, 100)
+
     franke = frnk.FrankeRegression()
+    franke.SetHyperParameter("None")
+    franke.SetModelComplexity("polynomial")
     franke.SetResampler("None")
     franke.SetRegressor(gd.SGD, epochs=100, minibatches=100)
     franke.SetSklRegressor(skl.LinearRegression)
     franke.SetSystem(rows, cols, sigma) 
     franke.Run( testRatio, maxdegree )
 
+        #self.hyperParameters = {'None': self.NoHypers}
+        #self.models = {'polynomial': self.PolyNomialModel}
+        #self.resamplers = {'None': self.NoResample}
 
     
 
