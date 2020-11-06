@@ -10,10 +10,57 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-class _BaseFrankeRegressor:
+#def R2(self, target, model):
+#    return 1 - ( np.sum( (target-model)**2 )/np.sum( (target-np.mean(target))**2 ) )
+#
+#def singleMSE(self, target, model): 
+#    return np.mean( (target - model)**2 ) 
+#
+#def multiMSE(self, target, model):
+#    assert model.shape[1] > 1, "use the single version instead"
+#    return np.mean( np.mean(    (target - model)**2, axis=1, keepdims=True ) )
+
+
+class FrankeRegression:
+    """
+    class for performing Linear regression on the Franke function.
+    I think the specific regressor(OLS, SGD, etc.) should be made 
+    outside the class, as this is mainly to set up and keep the necessary 
+    values, x,y,z coordinates and such. 
+    """
 
     def __init__(self):
-        self.setup = False
+        self.regressor = None
+        self.sklregressor = None
+        self.hyperParameters = [None]
+        self.resamplers = {'None': self.NoResample}
+        self.resampler = None
+        self.testRatio = .2
+
+    def SetSystem(self, rows, cols, sigma): 
+        row = np.linspace(0,1,rows)
+        col = np.linspace(0,1,cols)
+        self.row_mat, self.col_mat = np.meshgrid(col, row)
+        self.height_mat = \
+                self.FrankeFunction(self.row_mat, self.col_mat)\
+                + sigma*np.random.randn(rows, cols)
+        self.row = self.row_mat.ravel()
+        self.col = self.col_mat.ravel()
+        self.height = self.height_mat.ravel()
+        self.setup = True
+
+    def SetHyperParameter(self, hyperParameters):
+        self.hyperParameters = hyperParameters
+
+    def SetResampler(self, resampler, **kwargs):
+        assert resampler in self.resamplers, resampler + " not implemented"
+        self.resampler = self.resamplers[resampler]
+
+    def SetRegressor(self, regressor, **kwargs):
+        self.regressor = regressor(**kwargs)
+
+    def SetSklRegressor(self, sklregressor, **kwargs):
+        self.sklregressor = sklregressor(**kwargs)
 
     def PolyFeatures(self, x, y, n ):
         """
@@ -34,17 +81,6 @@ class _BaseFrankeRegressor:
                         X[:,q+k] = (x**(i-k))*(y**k)
         return X
 
-
-    def R2(self, target, model):
-        return 1 - ( np.sum( (target-model)**2 )/np.sum( (target-np.mean(target))**2 ) )
-
-    def singleMSE(self, target, model): 
-        return np.mean( (target - model)**2 ) 
-
-    def multiMSE(self, target, model):
-        assert model.shape[1] > 1, "use the single version instead"
-        return np.mean( np.mean(    (target - model)**2, axis=1, keepdims=True ) )
-
     def TrainTestSplit(self, data, test_ratio=.2):
         """
         takes data array and returns randomised
@@ -55,6 +91,7 @@ class _BaseFrankeRegressor:
         self.test = shuffle[:test_size] # [test-size|               ]
         self.train = shuffle[test_size:]# [         |   train size  ]
         return self.train, self.test
+
 
     def FrankeFunction(self, x,y):
         term1 = 0.75*np.exp(               
@@ -68,60 +105,22 @@ class _BaseFrankeRegressor:
 
         return term1 + term2 + term3 + term4
 
-    def SetSystem(self, rows, cols, sigma): 
-        row = np.linspace(0,1,rows)
-        col = np.linspace(0,1,cols)
-        self.row_mat, self.col_mat = np.meshgrid(col, row)
-        self.height_mat = \
-                self.FrankeFunction(self.row_mat, self.col_mat)\
-                + sigma*np.random.randn(rows, cols)
-        self.row = self.row_mat.ravel()
-        self.col = self.col_mat.ravel()
-        self.height = self.height_mat.ravel()
-        self.setup = True
-
-
-
-class FrankeRegression(_BaseFrankeRegressor):
-    """
-    class for performing Linear regression on the Franke function.
-    I think the specific regressor(OLS, SGD, etc.) should be made 
-    outside the class, as this is mainly to set up and keep the necessary 
-    values, x,y,z coordinates and such. 
-    """
-
-    def __init__(self):
-        self.regressor = None
-        self.sklregressor = None
-        self.hyperParameters = {'None': self.NoHypers}
-        self.models = {'polynomial': self.PolyNomialModel}
-        self.resamplers = {'None': self.NoResample}
-        self.hyperParameter = None
-        self.modelComplexity = None
-        self.resampler = None
-        self.testRatio = .2
-
-    def SetHyperParameter(self, hyper, **kwargs):
-        assert hyper in self.hyperParameters, hyper + " not implemented"
-        self.hyperParameter = self.hyperParameters[hyper]
-
-    def SetModelComplexity(self, model, **kwargs):
-        assert model in self.models, model + " not implemented"
-        self.modelComplexity = self.models[model]
-
-    def SetResampler(self, resampler, **kwargs):
-        assert resampler in self.resamplers, resampler + " not implemented"
-        self.resampler = self.resamplers[resampler]
-
-    def SetRegressor(self, regressor, **kwargs):
-        self.regressor = regressor(**kwargs)
-
-    def SetSklRegressor(self, sklregressor, **kwargs):
-        self.sklregressor = sklregressor(**kwargs)
-
     def Run(self,  testRatio=.2, maxdegree=10):
-        assert self.hyperParameter is not None, "please set hyperparameters"
-        assert self.modelComplexity is not None, "please set model complexity"
+        """
+        Running the regression of the franke system set up previosly.
+        The methods for resampling differs a bit, so the regressor and
+        the resampler are separate functions (the regressor being it's 
+        own class). 
+
+        The values that come into the regressor, such as 
+        the hyper parameters and the set of features and outputs selected
+        for the current round of resampling are found from the main class. 
+        the hyperparameter is by default a list of a single nonetype object,
+        which can be set do otherwise before running the regression. 
+        
+        The values for the resampler is also set beforehand, likely to be
+        put in a dict. 
+        """
         assert self.resampler is not None, "resampling method not set"
         assert self.regressor is not None, "Regressor not set"
         assert self.sklregressor is not None, "skl regressor not set"
@@ -130,30 +129,27 @@ class FrankeRegression(_BaseFrankeRegressor):
         self.maxdegree = maxdegree
         self.sklTheta = []; self.SGDTheta = []
 
-        self.hyperParameter()
-
-        self.relldiff = np.zeros(self.maxdegree)
-        for i in range(self.maxdegree):
-            self.relldiff[i] = np.mean((self.sklTheta[i]-self.SGDTheta[i])**2)
-
-    def NoHypers(self):
-        self.modelComplexity()
-
-    def PolyNomialModel(self):
         for deg in tqdm(range(1, self.maxdegree+1)):
             features = self.PolyFeatures(self.row, self.col, deg)
             self.resampler(features)
+            
+        self.relldiff = np.zeros(self.maxdegree)
+
+        for i in range(self.maxdegree):
+            self.relldiff[i] = np.mean((self.sklTheta[i]-self.SGDTheta[i])**2)
 
     def NoResample(self, features):
-            train, test = self.TrainTestSplit(self.height,self.testRatio)
-            heightTrain = self.height[train]; heightTest = self.height[test]
-            featuresTrain = features[train]; featuresTest = features[test]
+        train, test = self.TrainTestSplit(self.height,self.testRatio)
 
-            scaler = StandardScaler().fit(featuresTrain)
-            featuresTrain = scaler.transform(featuresTrain); featuresTest = scaler.transform(featuresTest)
-            #
-            self.sklregressor.fit(featuresTrain, heightTrain)
-            self.sklTheta.append(self.sklregressor.coef_)
-            #
-            self.regressor.fit(featuresTrain, heightTrain)
-            self.SGDTheta.append(self.regressor.theta)
+        heightTrain = self.height[train]; heightTest = self.height[test]
+        featuresTrain = features[train]; featuresTest = features[test]
+
+        scaler = StandardScaler().fit(featuresTrain)
+        featuresTrain = scaler.transform(featuresTrain); featuresTest = scaler.transform(featuresTest)
+        
+        self.sklregressor.fit(featuresTrain, heightTrain)
+        self.sklTheta.append(self.sklregressor.coef_)
+
+        self.regressor.fit(featuresTrain, heightTrain)
+        self.SGDTheta.append(self.regressor.theta)
+
