@@ -9,6 +9,9 @@ To Do's Project 2
 	*	learningrate 
 	*	learningschedule
 	Then move on
+*	Set low/med/high values for the hyperparameters above.
+*	then figure out how to present. 
+
 
 ### project description
 1   writing SGD code, first step:

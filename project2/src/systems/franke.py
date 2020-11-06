@@ -33,7 +33,6 @@ class FrankeRegression:
         self.regressor = None
         self.sklregressor = None
         self.hyperParameters = [None]
-        self.resamplers = {'None': self.NoResample}
         self.resampler = None
         self.testRatio = .2
 
@@ -52,12 +51,11 @@ class FrankeRegression:
     def SetHyperParameter(self, hyperParameters):
         self.hyperParameters = hyperParameters
 
-    def SetResampler(self, resampler, **kwargs):
-        assert resampler in self.resamplers, resampler + " not implemented"
-        self.resampler = self.resamplers[resampler]
-
     def SetRegressor(self, regressor, **kwargs):
         self.regressor = regressor(**kwargs)
+
+    def SetLearningMode(self, mode, t):
+        self.regressor.SetLearningMode(mode, t)
 
     def SetSklRegressor(self, sklregressor, **kwargs):
         self.sklregressor = sklregressor(**kwargs)
@@ -121,35 +119,49 @@ class FrankeRegression:
         The values for the resampler is also set beforehand, likely to be
         put in a dict. 
         """
-        assert self.resampler is not None, "resampling method not set"
+        #assert self.resampler is not None, "resampling method not set"
         assert self.regressor is not None, "Regressor not set"
         assert self.sklregressor is not None, "skl regressor not set"
         assert self.setup, "You need to setup the system!"
 
         self.maxdegree = maxdegree
         self.sklTheta = []; self.SGDTheta = []
+        self.reldiff = np.zeros((\
+                len(self.epochs), 
+                len(self.minibatches), 
+                len(self.learningrates)
+                ))
 
-        for deg in tqdm(range(1, self.maxdegree+1)):
-            features = self.PolyFeatures(self.row, self.col, deg)
-            self.resampler(features)
+        for i in range(len(self.epochs)):
+            print("*"*50)
+            print("epochs: ", self.epochs[i])
+            for j in range(len(self.minibatches)):
+                print("minibatches: ", self.minibatches[j])
+                for k in range(len(self.learningrates)):
+                    print("learningrate: ", self.learningrates[k])
+                    for deg in tqdm(range(self.maxdegree)):
+                        features = self.PolyFeatures(self.row, self.col, deg+1)
+                        train, test = self.TrainTestSplit(self.height,self.testRatio)
+
+                        heightTrain = self.height[train]; heightTest = self.height[test]
+                        featuresTrain = features[train]; featuresTest = features[test]
+
+                        scaler = StandardScaler().fit(featuresTrain)
+                        featuresTrain = scaler.transform(featuresTrain); featuresTest = scaler.transform(featuresTest)
+                        
+                        self.sklregressor.fit(featuresTrain, heightTrain)
+                        self.sklTheta.append(self.sklregressor.coef_)
+
+                        self.regressor.fit(\
+                                featuresTrain, 
+                                heightTrain,
+                                self.epochs[i],
+                                self.minibatches[j],
+                                self.learningrates[k])
+                        self.SGDTheta.append(self.regressor.theta)
             
-        self.relldiff = np.zeros(self.maxdegree)
+                    self.relldiff = np.zeros(self.maxdegree)
 
-        for i in range(self.maxdegree):
-            self.relldiff[i] = np.mean((self.sklTheta[i]-self.SGDTheta[i])**2)
-
-    def NoResample(self, features):
-        train, test = self.TrainTestSplit(self.height,self.testRatio)
-
-        heightTrain = self.height[train]; heightTest = self.height[test]
-        featuresTrain = features[train]; featuresTest = features[test]
-
-        scaler = StandardScaler().fit(featuresTrain)
-        featuresTrain = scaler.transform(featuresTrain); featuresTest = scaler.transform(featuresTest)
-        
-        self.sklregressor.fit(featuresTrain, heightTrain)
-        self.sklTheta.append(self.sklregressor.coef_)
-
-        self.regressor.fit(featuresTrain, heightTrain)
-        self.SGDTheta.append(self.regressor.theta)
+                    for i in range(self.maxdegree):
+                        self.relldiff[i] = np.mean((self.sklTheta[i]-self.SGDTheta[i])**2)
 

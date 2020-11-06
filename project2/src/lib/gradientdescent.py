@@ -17,34 +17,46 @@ class _gradientDescent:
         return gradient
 
 class SGD(_gradientDescent):
-    def __init__(self, minibatches, epochs, *args):
+    def __init__(self, *args):
         super().__init__(*args)
-        self.epochs = epochs #need to configure setting epochs.
-        self.t0, self.t1 = 5, 50 #for varying learningrate as we go.
-                                #TODO implement setting t0 and t1
-        self.minibatches = minibatches
+        self.learning = None
+        self.t = None
+        self.lrnmode = {\
+                'static': self.static, 
+                'dynamic': self.dynamic}
 
-    def lrnschdl(self, t): return self.t0 / (t + self.t1)
+    def SetLearningMode(self, mode, t):
+        """
+        sets the learning rate to either 'static' or 'dynamic' and the 
+        rate to either the static fraction t, or the list of the t0 and t1 
+        for the dynamic case
+        """
+        assert mode in self.lrnmode, mode + " input, needs 'static' or 'dynamic'"
+        self.learning = self.lrnmode[mode]
+        self.t = t
 
-    def fit(self, X, y):
+    def dynamic(self, t): return self.t[0] / (t + self.t[1])
+    def static(self, t): return self.t
+
+    def fit(self, X, y, minibatches, epochs, lrn):
+        assert self.learning is not None, "need to set learning mode"
+
         self.null = False
-        batchsize = int(y.shape[0]/self.minibatches)
+        batchsize = int(y.shape[0]/minibatches)
         theta = np.random.randn(X.shape[1])
-        for epoch in range(self.epochs):
-            for batch in range(self.minibatches):
-                rand = np.random.randint(self.minibatches)
+        self.t = lrn
+        for epoch in range(epochs):
+            for batch in range(minibatches):
+                rand = np.random.randint(minibatches)
                 batch = rand*batchsize
-                Xi = X[batch:batch+batchsize]
-                yi = y[batch:batch+batchsize]
+                Xi = X[batch:batch+batchsize]; yi = y[batch:batch+batchsize]
                 gradients = self.gradient(Xi, yi, theta) 
-                eta = self.lrnschdl(epoch*self.minibatches+batch) #the y.shape here is the minibatch and should really be declared at some point
+                eta = self.learning(epoch*minibatches+batch) 
                 theta -= eta*gradients
             if self.null:
                 print("found a 0")
-                self.theta = theta
-                return self.theta
+                break
         self.theta = theta
-        #return self.theta
         
 class GD(_gradientDescent):
 

@@ -19,10 +19,10 @@ def main():
     epochs = np.arange(10, 100)
 
     franke = frnk.FrankeRegression()
-    franke.SetResampler("None")
-    franke.SetRegressor(gd.SGD, epochs=100, minibatches=100)
+    franke.SetRegressor(gd.SGD)#, epochs=100, minibatches=100)
     franke.SetSklRegressor(skl.LinearRegression)
     franke.SetSystem(rows, cols, sigma) 
+    franke.SetLearningMode('static', 0.1)
     franke.Run( testRatio, maxdegree )
 
 if __name__ == "__main__":
