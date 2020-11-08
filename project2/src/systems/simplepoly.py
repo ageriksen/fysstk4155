@@ -28,24 +28,11 @@ class SimpleRegression:
         sklreg.fit(x, y.ravel())
         print("skl regr.\n", sklreg.intercept_, sklreg.coef_)
 
-        #GD
-        lrnrt = 0.01
-        maxiter = 1e5
-        grad = gd.GD(lrnrt)
-        GDBeta = grad.FindBeta(X,y.ravel(), maxiter)
-        print("own GD\n", GDBeta)
-
         #SGD
-        sgrad = gd.SGD(lrnrt)
-        SGDBeta = sgrad.FindBeta(X, y.ravel(), maxiter)
-        print("own SGD\n", SGDBeta)
+        sgrad = gd.SGD()
+        sgrad.SetLearningMode('static', .01)
+        sgrad.fit(X, y.ravel(), epochs=100, minibatches=100, lrn=.01)
+        print("own SGD\n", sgrad.theta)
 
         print("="*50)
         
-        plt.figure()
-        plt.plot(x, y, label="y")
-        plt.plot(x, X@theta_ols, label="ols fit")
-        plt.plot(x, X@GDBeta, label="GD fit")
-        plt.plot(x, X@SGDBeta, label="SGD fit")
-        plt.legend()
-        plt.show()

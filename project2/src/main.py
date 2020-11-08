@@ -12,8 +12,8 @@ import sklearn.linear_model as skl
 
 def main():
     np.random.seed(2020)
-    rows = 200; cols = 100; sigma = .5
-    maxdegree = 10; testRatio=.2
+    rows = 200; cols = 100; sigma = 0
+    maxdegree = 2; testRatio=.2
 
     #epochs = np.arange(10, 100)
     #minibatches = np.arange(10, 100)#int(rows*cols*.4), int(rows*cols*.8)) 
@@ -23,13 +23,15 @@ def main():
     #learningrates = np.array([.0001, .001, .01])
     learningrates = np.array([.01])
 
+    simple = smpl.SimpleRegression()
+    simple.RunSimpleExample(100)
 
-    franke = frnk.FrankeRegression()
-    franke.SetRegressor(gd.SGD)#, epochs=100, minibatches=100)
-    franke.SetSklRegressor(skl.LinearRegression)
-    franke.SetSystem(rows, cols, sigma) 
-    franke.SetLearningMode('static', 0.1)
-    franke.Run( testRatio, maxdegree, epochs, minibatches, learningrates)
+    #franke = frnk.FrankeRegression()
+    #franke.SetRegressor(gd.SGD)#, epochs=100, minibatches=100)
+    #franke.SetSklRegressor(skl.LinearRegression)
+    #franke.SetSystem(rows, cols, sigma) 
+    #franke.SetLearningMode('static', 0.1)
+    #franke.Run( testRatio, maxdegree, epochs, minibatches, learningrates)
 
 if __name__ == "__main__":
     main()
