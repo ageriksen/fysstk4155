@@ -13,7 +13,7 @@ class SimpleRegression:
     def RunSimpleExample(self, dtpts):
         from sklearn.linear_model import SGDRegressor
         x = np.random.rand(dtpts,1) # random col matrix of positions
-        y = 4 + 3*x*np.random.randn(dtpts,1) # polynomial with noise 
+        y = 4 + 3*x# + np.random.randn(dtpts,1) # polynomial with noise 
 
         X = np.c_[np.ones((dtpts, 1)), x] # feature matrix w bias and inputs
         
