@@ -103,7 +103,8 @@ class FrankeRegression:
 
         return term1 + term2 + term3 + term4
 
-    def Run(self,  testRatio=.2, maxdegree=10):
+    def Run(self,  testRatio, maxdegree,\
+            epochs, minibatches, learningrates):
         """
         Running the regression of the franke system set up previosly.
         The methods for resampling differs a bit, so the regressor and
@@ -127,18 +128,15 @@ class FrankeRegression:
         self.maxdegree = maxdegree
         self.sklTheta = []; self.SGDTheta = []
         self.reldiff = np.zeros((\
-                len(self.epochs), 
-                len(self.minibatches), 
-                len(self.learningrates)
+                len(epochs), 
+                len(minibatches), 
+                len(learningrates),
+                self.maxdegree
                 ))
 
-        for i in range(len(self.epochs)):
-            print("*"*50)
-            print("epochs: ", self.epochs[i])
-            for j in range(len(self.minibatches)):
-                print("minibatches: ", self.minibatches[j])
-                for k in range(len(self.learningrates)):
-                    print("learningrate: ", self.learningrates[k])
+        for i in range(len(epochs)):
+            for j in range(len(minibatches)):
+                for k in range(len(learningrates)):
                     for deg in tqdm(range(self.maxdegree)):
                         features = self.PolyFeatures(self.row, self.col, deg+1)
                         train, test = self.TrainTestSplit(self.height,self.testRatio)
@@ -155,13 +153,14 @@ class FrankeRegression:
                         self.regressor.fit(\
                                 featuresTrain, 
                                 heightTrain,
-                                self.epochs[i],
-                                self.minibatches[j],
-                                self.learningrates[k])
+                                epochs[i],
+                                minibatches[j],
+                                learningrates[k])
                         self.SGDTheta.append(self.regressor.theta)
             
-                    self.relldiff = np.zeros(self.maxdegree)
-
-                    for i in range(self.maxdegree):
-                        self.relldiff[i] = np.mean((self.sklTheta[i]-self.SGDTheta[i])**2)
+                        print("betas SGD and SKL:", flush=True)
+                        print("SGD:\n", self.regressor.theta, flush=True)
+                        print("SKL:\n", self.sklregressor.coef_, flush=True)
+                        self.reldiff[i,j,k,deg] = np.mean((self.sklregressor.coef_ - self.regressor.theta)**2)
+                        print("rel-difference:\n", self.reldiff[i,j,k,deg], flush=True)
 
