@@ -2,15 +2,8 @@ To Do's Project 2
 ---
 
 ###	after speaking with TA
-*	The point of this is a benchmark. Setup a rel. difference with 
-	beta produced, cehck for 
-	*	Epochs
-	*	minibatches
-	*	learningrate 
-	*	learningschedule
-	Then move on
-*	Set low/med/high values for the hyperparameters above.
 *	then figure out how to present. 
+	* note doen edge cases for discussion
 
 
 ### project description
@@ -40,3 +33,13 @@ Done
 *   scikitlearn solutions for 
 	*	ols
 *   implement mse, r2 etc. for SGD 
+
+###	after speaking with TA
+*	The point of this is a benchmark. Setup a rel. difference with 
+	beta produced, cehck for 
+	*	Epochs
+	*	minibatches
+	*	learningrate 
+	*	learningschedule
+	Then move on
+*	Set low/med/high values for the hyperparameters above.
