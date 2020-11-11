@@ -3,6 +3,8 @@ import numpy as np
 from tqdm import tqdm
 
 class _gradientDescent:
+    #TODO Gradient is too specific. need to implement setting
+    #       it to given class object. 
     def __init__(self):
         self.null = False
 
@@ -57,6 +59,20 @@ class SGD(_gradientDescent):
                 print("found a 0")
                 break
         self.theta = theta
+
+class generalSGD:
+
+    def fit(self, X, y, batches, epochs, learningrate):
+
+        batchsize = int(float(y.shape[0])/minibatches)#force float division, then take lowest integer
+        for epoch in range(epochs):
+            for batch in range(batches):
+                rand = np.random.randint(minibatches)
+                minibatch = rand*batchsize
+                Xi = X[minibatch:minibatch+batchsize]
+                yi = y[minibatch:minibatch+batchsize]
+                gradients = self.gradient(Xi, yi, eta)
+                theta -= eta*gradients
         
 class GD(_gradientDescent):
 
