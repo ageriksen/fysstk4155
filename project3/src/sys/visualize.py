@@ -32,12 +32,15 @@ print("*"*10)
 
 
 meanpd = pd.DataFrame(inputs, columns=labels)
-corr = meanpd.corr().round(1) # pairwise correlation collumns, exclude NA/null values
-        
+outputpd = pd.Series(outputs)
+corr = meanpd.corrwith(outputpd).round(1) # pairwise correlation collumns, exclude NA/null values
+
+print(corr)
+
 #plot heatmap of correlation matrix
-plt.figure()
-sns.heatmap(corr, cbar=True, 
-        xticklabels=labels, yticklabels=labels,
-        cmap='YlOrRd')
-plt.show()
+#plt.figure()
+#sns.heatmap(corr, cbar=True, 
+#        xticklabels=labels, yticklabels=labels,
+#        cmap='YlOrRd')
+#plt.show()
 
