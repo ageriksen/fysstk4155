@@ -43,8 +43,17 @@ logreg.fit(Xtrain_scaled, ytrain)
 print('test set accuracy with logreg, scaled data: {:.2f}'.format(logreg.score(Xtest_scaled, ytest)))
 
 correlation = cdf.drop(['target'], axis=1).corrwith(cdf['target'])
-important = correlation.abs().sort_values(ascending=False)[:int(correlation.size*.5)]
+important = correlation.abs().sort_values(ascending=False)[:int(correlation.size*.3)]
 print('*'*10)
 print(important)
 print('*'*10)
 
+Xtrain, Xtest, ytrain, ytest = train_test_split(cdf[important.index], cdf['target'])
+
+scaler = StandardScaler()
+scaler.fit(Xtrain)
+Xtrain_scaled = scaler.transform(Xtrain)
+Xtest_scaled = scaler.transform(Xtest)
+
+logreg.fit(Xtrain_scaled, ytrain)
+print('test accuracy, logreg, scaled data, important inputs: {:.2f}'.format(logreg.score(Xtest_scaled, ytest)))
