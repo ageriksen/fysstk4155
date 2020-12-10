@@ -23,7 +23,11 @@ import torch
 import torch.nn.functional as F
 
 torch.manual_seed(2020)
-X = torch.unsqueeze(torch.from_numpy(cancer.data), dim=1)
+#X = 
+print('*'*20)
+X = torch.tensor(torch.unsqueeze(torch.from_numpy(cancer.data), dim=1), dtype=torch.double)
+display(X)
+print('*'*20)
 y = torch.from_numpy(cancer.target)
 
 class Net(torch.nn.Module):
@@ -47,6 +51,7 @@ epochs = 200
 
 for t in range(epochs):
 
+    print('loop: ', t)
     prediction = net(X) #predict based on x
 
     #loss = loss_func(prediction, y)#( 1: nn output, 2: target )
