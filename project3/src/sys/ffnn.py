@@ -20,7 +20,7 @@ display(cdf)
 
 
 import torch
-#import torch.nn.functional as F
+import torch.nn.functional as F
 
 torch.manual_seed(2020)
 X = torch.tensor(
@@ -40,7 +40,7 @@ class Net(torch.nn.Module):
         return x
 
 #net = Net(n_feature=len(cancer.feature_names), n_hidden=len(cancer.feature_names), n_output=len(cancer.feature_names))
-net = Net(n_feature=1, n_hidden=10, n_output=1)
+net = Net(n_feature=len(cancer.feature_names), n_hidden=10, n_output=1)
 #print(net)
 
 optimizer = torch.optim.SGD(net.parameters(), lr=.2)
