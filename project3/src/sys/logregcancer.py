@@ -57,3 +57,5 @@ Xtest_scaled = scaler.transform(Xtest)
 
 logreg.fit(Xtrain_scaled, ytrain)
 print('test accuracy, logreg, scaled data, important inputs: {:.2f}'.format(logreg.score(Xtest_scaled, ytest)))
+#TODO reduce nr. of datapoints when fitting to encourage overfitting -> see if "best features" has more to say then.
+#TODO implement resampling methods.
