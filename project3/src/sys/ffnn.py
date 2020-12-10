@@ -20,14 +20,12 @@ display(cdf)
 
 
 import torch
-import torch.nn.functional as F
+#import torch.nn.functional as F
 
 torch.manual_seed(2020)
-#X = 
-print('*'*20)
-X = torch.tensor(torch.unsqueeze(torch.from_numpy(cancer.data), dim=1), dtype=torch.double)
-display(X)
-print('*'*20)
+X = torch.tensor(
+        torch.unsqueeze(torch.from_numpy(cancer.data), dim=1),
+        dtype=torch.float32)
 y = torch.from_numpy(cancer.target)
 
 class Net(torch.nn.Module):
@@ -41,20 +39,19 @@ class Net(torch.nn.Module):
         x = self.predict(x) #linear output
         return x
 
-net = Net(n_feature=len(cancer.feature_names), n_hidden=len(cancer.feature_names), n_output=len(cancer.feature_names))
-print(net)
+#net = Net(n_feature=len(cancer.feature_names), n_hidden=len(cancer.feature_names), n_output=len(cancer.feature_names))
+net = Net(n_feature=1, n_hidden=10, n_output=1)
+#print(net)
 
 optimizer = torch.optim.SGD(net.parameters(), lr=.2)
 loss_func = torch.nn.CrossEntropyLoss()#TODO find the correct loss func for the nn w/ binary classification
 
 epochs = 200
-
 for t in range(epochs):
 
-    print('loop: ', t)
     prediction = net(X) #predict based on x
 
-    #loss = loss_func(prediction, y)#( 1: nn output, 2: target )
+    loss = loss_func(prediction, y)#( 1: nn output, 2: target )
 
     #optimizer.zero_grad()
     #loss.backward()
