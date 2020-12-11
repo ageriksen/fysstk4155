@@ -45,7 +45,8 @@ net = Net(n_feature=len(cancer.feature_names), n_hidden=10, n_output=1)
 #print(net)
 
 optimizer = torch.optim.SGD(net.parameters(), lr=.2)
-loss_func = torch.nn.CrossEntropyLoss()#TODO find the correct loss func for the nn w/ binary classification
+#loss_func = torch.nn.CrossEntropyLoss()#TODO find the correct loss func for the nn w/ binary classification
+loss_func = torch.nn.BCELoss()#TODO find the correct loss func for the nn w/ binary classification
 
 epochs = 200
 for t in range(epochs):
