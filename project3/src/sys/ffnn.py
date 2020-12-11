@@ -55,20 +55,27 @@ net = Net(n_feature=len(cancer.feature_names), n_hidden=10, n_output=1)
 optimizer = torch.optim.SGD(net.parameters(), lr=.2)
 loss_func = torch.nn.BCELoss()
 
-epochs = 200
-#difference = np.zeros(epochs)
+epochs = 10
+difference = np.zeros(epochs)
 for t in range(epochs):
 
+    #print('starting prediction')
     prediction = net(X) #predict based on x
 
+    #print('finding loss')
     loss = loss_func(prediction, y)#( 1: nn output, 2: target )
 
+    #print('optimizing')
     optimizer.zero_grad()
+    #print('backward')
     loss.backward()
+    #print('step optimizer')
     optimizer.step()
-    
-    #difference[t] = np.mean(abs( round(prediction) - y ) )
+    #print("this is where I'd find the score")
+    difference[t] = torch.mean(abs( torch.round(prediction) - y ) )
+    #print("score found")
 
 
+print(difference)
 #plt.plot(difference)
 #plt.show()
