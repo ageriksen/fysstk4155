@@ -27,6 +27,7 @@ X = torch.tensor(
         torch.unsqueeze(torch.from_numpy(cancer.data), dim=1),
         dtype=torch.float32)
 y = torch.from_numpy(cancer.target)
+y = y.reshape(y.numel(), 1)
 
 class Net(torch.nn.Module):
     def __init__(self, n_feature, n_hidden, n_output):
