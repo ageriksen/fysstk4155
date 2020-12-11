@@ -23,10 +23,16 @@ import torch
 import torch.nn.functional as F
 
 torch.manual_seed(2020)
-X = torch.tensor(
-        torch.unsqueeze(torch.from_numpy(cancer.data), dim=1),
-        dtype=torch.float32)
-y = torch.from_numpy(cancer.target)
+#X = torch.tensor(
+#        torch.squeeze(torch.from_numpy(cancer.data), dim=1),
+#        dtype=torch.float32)
+#y = torch.from_numpy(cancer.target, dtype=torch.float32)
+#y = y.reshape(y.numel(), 1)
+
+X = torch.tensor(cancer.data, dtype=torch.float32)
+y = torch.tensor(cancer.target, dtype=torch.float32)
+
+X = X.reshape(y.numel(), len(cancer.feature_names))
 y = y.reshape(y.numel(), 1)
 
 class Net(torch.nn.Module):
