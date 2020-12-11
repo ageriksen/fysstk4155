@@ -53,10 +53,10 @@ net = Net(n_feature=len(cancer.feature_names), n_hidden=10, n_output=1)
 #print(net)
 
 optimizer = torch.optim.SGD(net.parameters(), lr=.2)
-#loss_func = torch.nn.CrossEntropyLoss()#TODO find the correct loss func for the nn w/ binary classification
-loss_func = torch.nn.BCELoss()#TODO find the correct loss func for the nn w/ binary classification
+loss_func = torch.nn.BCELoss()
 
 epochs = 200
+#difference = np.zeros(epochs)
 for t in range(epochs):
 
     prediction = net(X) #predict based on x
@@ -67,4 +67,8 @@ for t in range(epochs):
     loss.backward()
     optimizer.step()
     
+    #difference[t] = np.mean(abs( round(prediction) - y ) )
 
+
+#plt.plot(difference)
+#plt.show()
