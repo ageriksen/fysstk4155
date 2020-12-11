@@ -40,10 +40,12 @@ class Net(torch.nn.Module):
         super(Net, self).__init__()
         self.hidden = torch.nn.Linear(n_feature, n_hidden)#hiddenlayer
         self.predict = torch.nn.Linear(n_hidden, n_output)#outputlayer
+        self.sigmoid = torch.nn.Sigmoid()
 
     def forward(self, x):
         x = F.relu(self.hidden(x))#activation for hidden layer
         x = self.predict(x) #linear output
+        x = self.sigmoid(x)
         return x
 
 #net = Net(n_feature=len(cancer.feature_names), n_hidden=len(cancer.feature_names), n_output=len(cancer.feature_names))
@@ -61,8 +63,8 @@ for t in range(epochs):
 
     loss = loss_func(prediction, y)#( 1: nn output, 2: target )
 
-    #optimizer.zero_grad()
-    #loss.backward()
-    #optimizer.step()
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
     
 
