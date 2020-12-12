@@ -62,15 +62,17 @@ net = Net(n_feature=len(cancer.feature_names), n_hidden=10, n_output=1)
 optimizer = torch.optim.SGD(net.parameters(), lr=.2)
 loss_func = torch.nn.BCELoss()
 
-epochs = 10
-difference = np.zeros(epochs)
+epochs = 1000
+difference_train = np.zeros(epochs)
+difference_test = np.zeros(epochs)
 for t in range(epochs):
 
-    #print('starting prediction')
-    prediction = net(X_train_scaled) #predict based on x
+    #print('starting prediction_train')
+    prediction_train = net(X_train_scaled) #predict based on x
+    prediction_test = net(X_test_scaled)
 
     #print('finding loss')
-    loss = loss_func(prediction, y_train)#( 1: nn output, 2: target )
+    loss = loss_func(prediction_train, y_train)#( 1: nn output, 2: target )
 
     #print('optimizing')
     optimizer.zero_grad()
@@ -79,10 +81,13 @@ for t in range(epochs):
     #print('step optimizer')
     optimizer.step()
     #print("this is where I'd find the score")
-    difference[t] = 1 - torch.mean(abs( torch.round(prediction) - y_train ) )
+    difference_train[t] = 1 - torch.mean(abs( torch.round(prediction_train) - y_train ) )
+    difference_test[t] = 1 - torch.mean(abs( torch.round(prediction_test) - y_test ) )
+    
     #print("score found")
 
 
-print(difference)
-#plt.plot(difference)
-#plt.show()
+print(difference_train)
+plt.plot(difference_train)
+plt.plot(difference_test)
+plt.show()
