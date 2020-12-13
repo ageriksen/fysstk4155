@@ -63,7 +63,7 @@ net = Net(n_feature=len(cancer.feature_names), n_hidden=10, n_output=1)
 optimizer = torch.optim.SGD(net.parameters(), lr=.2)
 loss_func = torch.nn.BCELoss()
 
-epochs = 100000
+epochs = 1000
 accuracy_train = np.zeros(epochs)
 accuracy_test = np.zeros(epochs)
 #stop = epochs
@@ -86,13 +86,13 @@ for t in range(epochs):
         count = 0
     if accuracy_test[t] < best:
         count += 1
-        if count > 50: # 10 epochs beyond the last increase in accuracy
+        if count > 25: # 10 epochs beyond the last increase in accuracy
             stop = t
             break
 
 
-accuracy_train = accuracy_train[::stop]
-accuracy_test = accuracy_test[::stop]
+accuracy_train = accuracy_train[:stop]
+accuracy_test = accuracy_test[:stop]
 
 #print(accuracy_train)
 plt.plot(accuracy_train)
