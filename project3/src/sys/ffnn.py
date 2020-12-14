@@ -56,9 +56,7 @@ class Net(torch.nn.Module):
         x = self.sigmoid(x)
         return x
 
-#net = Net(n_feature=len(cancer.feature_names), n_hidden=len(cancer.feature_names), n_output=len(cancer.feature_names))
 net = Net(n_feature=len(cancer.feature_names), n_hidden=10, n_output=1)
-#print(net)
 
 optimizer = torch.optim.SGD(net.parameters(), lr=.2)
 loss_func = torch.nn.BCELoss()
@@ -66,7 +64,7 @@ loss_func = torch.nn.BCELoss()
 epochs = 1000
 accuracy_train = np.zeros(epochs)
 accuracy_test = np.zeros(epochs)
-#stop = epochs
+stop = epochs
 count = 0
 for t in range(epochs):
 
@@ -94,7 +92,6 @@ for t in range(epochs):
 accuracy_train = accuracy_train[:stop]
 accuracy_test = accuracy_test[:stop]
 
-#print(accuracy_train)
 plt.plot(accuracy_train)
 plt.plot(accuracy_test)
 plt.show()
