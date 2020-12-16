@@ -1,0 +1,224 @@
+%\documentclass[10pt]{revtex4-1}
+\documentclass[10pt]{article}
+\listfiles               %  print all files needed to compile this document
+\usepackage{blindtext}
+
+\usepackage{amsmath}
+\usepackage{xparse}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{bm}
+\usepackage[colorlinks=true,urlcolor=blue,citecolor=blue]{hyperref}
+\usepackage{color}
+\usepackage{physics}
+%\usepackage{algorithm2e}
+%\usepackage{algpseudocode}
+%\usepackage{pgfplots}
+\usepackage{pgfplotstable, booktabs, mathpazo}
+%\usepackage{natbib}
+%
+\pgfplotsset{compat=1.15}
+
+%\pgfplotstableset{
+%    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
+%    every last row/.style={after row=\hline \bottomrule},
+%    every first column/.style={
+%        column type/.add={|}{}
+%        },
+%    every last column/.style={
+%        column type/.add={}{|}
+%        },
+%}
+%\pgfplotstableset{
+%    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
+%    every last row/.style={after row=\hline \bottomrule}
+%}
+
+%\begin{figure}[hbtp]
+%\includegraphics[scale=0.4]{.pdf}
+%\caption{}
+%\label{fig:}
+%\end{figure}
+
+%\begin{tikzpicture}
+%    \begin{axis}[
+%            title= Earth-Sun system, Forward Euler integration,
+%            xlabel={$x$},
+%            ylabel={$y$},
+%        ]
+%        \addplot table {../runresults/earthEuler2body.dat}
+%    \end{axis}
+%\end{tikzpicture}
+
+\title{Project 3
+	Wisconsin Cancer data and Logistic regression and Feed Forward Neural Networks}
+\author{Annika Eriksen}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+	The wisconsin cancer data is a staple of machine learning and should therefore 
+	be a good point to analyse different methods. I analyze the data using 2 different 
+	methods, firstly through logistic regression and later on using a Feed Forward Neural
+	Network 
+\end{abstract}
+
+\section{introduction}
+
+The Wisconsin Cancer dataset is a widely used set for classification
+problems, and offers a good starting point to compare implementations of
+machine learning methods. I have put the set through 2 different methods,
+Logistic regression and a Feed Forward Neural Network. 
+
+First, the Logistic regression takes in the data and feeds it into the
+sklearn logistic regression method.  This is done without- and then with
+scaling the data to see prediction accuracy depending on these. Then I take
+only those features with the greatest correlation to a malignant tumour and
+train the set on those only, to see the predictive ability of the methods
+based on these. 
+
+While we see an expected increase in accuracy after normalising the features,
+there is a rather unexpected decrease in accuracy when only including the more
+important features.
+
+Then, Implementing a Feed Forward Neural Network (ffnn), We construct a
+network with 1 hidden layer and a binary input, either malignant or benign.
+The initial model is then iterated a number of times, or until the
+predictive accuracy of the model on the test set has passed it's peak. 
+
+As one expects, the neural net quickly goes toward an above 90\% accuracy for
+both training and test set until eventually overfitting sets in and the test
+set accuracy starts to fall off. 
+
+
+%\section{theory}
+
+\section{methods}
+
+%insert the theory for logistic regression and ffnn, see lect. notes and the
+%relevant course literature mentioned there. 
+
+The base problem to be solved with the cancer data set is a binary benign vs.
+malignant tumor, 0 or 1 encoded respectively, 
+
+\begin{align}
+y = 
+	\begin{bmatrix}
+		0 & \text{benign} \\
+		1 & \text{malignant}
+	\end{bmatrix}.
+	\label{yclass}
+\end{align}
+
+We have 2 \emph{classes}, which form the entirety of the possible outcomes within
+the set. Like with regression I want a model to give an expected value for a given 
+set of samples for the features. A way to model would be to assume some linear functional
+dependence, along the lines of
+
+\begin{align*}
+	f(y_i|x_i) = \beta_0 + \beta_1 x_1.
+\end{align*}
+
+Although this could contain values outside of 0 and 1. Taking the mean solves
+this and forces $f(x|y) \in [0, 1]$. This then can be seen as the probability
+for finding a given value for $y_i$ with a given $x_i$. This S-shaped function
+would give us the \emph{sigmoid} function. 	
+%TODO note that the perceptron model deals with a hard predictor, as opposed to
+%the soft predictor of logistic regression.
+The soft predictor gives a probabilistic prediction of the class of outcome,
+given the input feature. In my case, this is either of the options in
+y in eq \ref{yclass}.  The Sigmoid, or \emph{logit} function governs this
+probability prediction for a given event thus,
+
+\begin{align}
+	p(t) = \frac{1}{1 + \exp(-t)} = \frac{\exp(t)}{1+\exp(t)}
+	\label{logit}.
+\end{align}
+Noting, $1 - p(t) = p(-t)$.
+
+Since we have 2 possible outcomes, the probabilites are then given by
+\begin{align}
+	p(y=1|x_i, \hat{\beta}) &= \frac{ \exp(\beta_0 + \beta_1x_i) }
+								{ 1 + \exp(\beta_0 + \beta_1x_i) } 
+								\label{prob1}\\
+	p(y=0|x_i, \hat{\beta}) &= 1 - p(y=1|x_i, \hat{\beta})\label{prob0}.
+\end{align}
+Denoting the biases with $\mathbf{\beta}$ which I want to extract from the dataset. 
+
+Using the Maximum Likelihood Estimation %TODO cite from Hastie or Geron
+principle The total probability for all possible outcomes of a dataset
+$\mathcal{D} = {(y_, \mathbf{x_i)}}$, with the binary in eq. \ref{yclass} for
+each $y_i$. The probabilities can be approximated by a product of the
+individual probabilities for an outcome of $y_i$,
+
+\begin{align}
+	\mathbf{P}(\mathcal{D}|\hat{\beta}) 
+		= \prod_{i=1}^n\qty[p(y_i=1|\hat{\beta})]^{y_i}
+			\qty[ 1 - p(y_i=1|\hat{\beta}) ]^{1-y_i}
+\end{align}
+And from this we can find the log-likelihood and our \emph{loss} function. 
+\begin{align}
+	\mathcal{C}(\hat{\beta}) = 
+		\sum_{i=1}^n \bigg( 
+			y_i \log\big[p(y_i=1|x_i\hat{\beta})\big] + 
+			(1 - y_i)\log\big[ 1 - p(y_i=1|x_i\hat{\beta})\big]\bigg).
+\end{align}
+
+Inserting for the probabilities with eq. \ref{prob1} and sorting the logarithms, we can
+rewrite the loss function. The cost/error function is the negative log-likelihood function, so it
+would be the negative of this rewrite. The end result then, is
+
+\begin{align}
+	\mathcal{C}(\hat{\beta}) = 
+		-\sum_{i=1}^n \qty(y_i(\beta_0 + \beta_1x_i) - \log(1 + \exp(\beta_0 + \beta_1x_i)))
+		\label{costfunc}.
+\end{align}
+This is also known as the cross-entropy. This can be further supplemented with regularization
+parameters much like with Lasso and Ridge regression. 
+
+The next step then is to minimize the cost function. Differentiating wrt. $\beta_0$ and $\beta_1$
+and compacting, gives us
+
+\begin{align}
+	\pdv{\mathcal{C}(\hat{\beta})}{\hat{\beta}} = 
+		- \mathbf{\hat{X}}^T (\hat{y} - \hat{p}).
+	\label{Cost1stDerivative}
+\end{align}
+Where $\hat{y}$ is a vector with the values $y_i$, $\mathbf{\hat{X}}$ is an $n\times p$ matrix containing 
+the $x_i$ values. The vector $\hat{p}$ contains the fitted probabilities $p(y_i|x_i,\hat{\beta})$. For 
+a step further and introducing another matrix, $\mathbf{\hat{W}}$ with elements 
+$p(y_i|x_i,\hat{\beta})(1 - p(y_i|x_i,\hat{\beta})$, we can arrive at a more compact version of the 
+2. derivative. 
+
+\begin{align}
+	\pdv[2]{\mathcal{C}(\hat{\beta})}{\hat{\beta}}{\hat{\beta}^T} 
+		= \mathbf{\hat{X}}^T \mathbf{\hat{W}} \mathbf{\hat{X}}
+	\label{Cost2ndDerivative}.
+\end{align}
+%TODO go through the implementation of the logreg script and explain the steps. then move on to nn. 
+
+\section{results}
+
+% Here go the results of the tests, the display of the data (unless implemented in methods)
+% here goes the prediction results and the accuracy plots. 
+% Also discuss, though do no conclude the results. 
+\blindtext
+
+\section{conclusion}
+
+% Here we wrap up the analysis and actually discuss and draw conclusions. 
+% Also pull in other works and wonder on future improvements and further work
+\blindtext
+
+%\section{appendix}
+
+%The appendix would be for any maths, tables or graphs that don't quite fit into the
+%body of the text. Also a potential place for code, though I imagine I will merely refer to
+%github for this. 
+
+%\bibliography{\string~/Documents/bibliography/Bibliography}
+
+\end{document}
+
