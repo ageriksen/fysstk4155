@@ -17,7 +17,6 @@
 \usepackage{pgfplotstable, booktabs, mathpazo}
 \usepackage{natbib}
 
-\bibliographystyle{dinat}
 \pgfplotsset{compat=1.15}
 
 \pgfplotstableset{
@@ -117,7 +116,7 @@ y =
 We have 2 \emph{classes}, which form the entirety of the possible outcomes within
 the set. Like with regression I want a model to give an expected value for a given 
 set of samples for the features. A way to model would be to assume some linear functional
-dependence, along the lines of (\cite{MortenLectureNotes2020})
+dependence, along the lines of
 
 \begin{align*}
 	f(y_i|x_i) = \beta_0 + \beta_1 x_1.
@@ -132,7 +131,7 @@ would give us the \emph{sigmoid} function.
 The soft predictor gives a probabilistic prediction of the class of outcome,
 given the input feature. In my case, this is either of the options in
 y in eq \ref{yclass}.  The Sigmoid, or \emph{logit} function governs this
-probability prediction for a given event thus, (\cite{MortenLectureNotes2020})
+probability prediction for a given event thus,
 
 \begin{align}
 	p(t) = \frac{1}{1 + \exp(-t)} = \frac{\exp(t)}{1+\exp(t)}
@@ -325,8 +324,7 @@ The back propagation error is
 Which we apply once the layers have been passed through forward, using the
 outputs of each layer and propagating the errors backwards. Using gradient
 descent, we update the weights of each node according to the gradient and the
-learningrate. The source code for both methods can be found at the projects 
-github page, \cite{AnnikaGit2020}.
+learningrate. 
 
 %TODO describe neural nets
 
@@ -359,14 +357,12 @@ than the 2 sister methods at 95\%, see table \ref{tab:logreg}
 	\label{tab:logreg}
 \end{table}
 
-For the neural network the accuracy of the prediction quickly climbs to 94\%
-accuracy for both the training and test set after fewer than 10 epochs. Then
-the growth mellows somewhat. The training accuracy grows to about 99\% and
-remains stable here, the test accuracy climbs to a maximum of 97\% after 200
-epochs. The test accuracy eventually begins to taper off again towards the end.
-After roughly 600 epochs, the system is as accurate at predicting other data as
-it can be. Continued training at this point, as the predictive accuracy
-falters. The 2 accuracies can be seen in figure \ref{fig:ffnnaccuracy}
+For the neural network the accuracy of the prediction quickly climbs to 94\% accuracy for both the 
+training and test set after fewer than 10 epochs. Then the growth mellows somewhat. The training
+accuracy grows to about 99\% and remains stable here, the test accuracy climbs to a maximum of 97\%
+after 200 epochs. The test accuracy eventually begins to taper off again towards the end. After roughly
+600 epochs, the system is as accurate at predicting other data as it can be. Continued training at this
+point, as the predictive accuracy falters. The 2 accuracies can be seen in figure \ref{fig:ffnnaccuracy}
 
 \begin{figure}[hbtp]
 \includegraphics[scale=.6]{../ffnnaccuracy.png}
@@ -384,35 +380,14 @@ falters. The 2 accuracies can be seen in figure \ref{fig:ffnnaccuracy}
 
 \section{conclusion}
 
-The results from the logistic regression points towards predicting based on all
-features rather than stripping away the less relevant features. This seems
-counterintuitive. A more likely outcome is an error in either the selection of
-relevant features, based on the correlation between the feature in question and
-the output values, or in the implementation of the scoring values. 
-
-As for the neural network, the accuracy plot follows the expected pattern, both
-approaching better accuracy with the training of the network, while eventually
-reaching the region of over-fitting where the accuracy of the test set drops
-off over time. 
-
-In this data set the 2 main methods produce very similar results, with the best
-predictive case eking out a narrow lead in terms of predictive ability wrt. to
-the neural net's maximum test accuracy of 97\% to the logistic regression's
-98\%.
-
-This is a very limited study and part of the results seem to deviate from the 
-expected trajectory of prediction in the logistic regression case, as removing the
-noise of the less relevant features should increase accuracy of prediction, because
-the model didn't have to try and fit this noise.
-
-Further work would definitely include a deeper study of the logistic regression case. 
-Figuring out and controlling for the feature selection process, and exploring different
-cos functions. In the neural net case, further exploration could be in whether the number
-of layers would impact the prediction. There are also variables wrt. the activation and 
-back-propagation algorithms used. 
+The results from the logistic regression points towards predicting based on all features rather than 
+stripping away the less relevant features. This seems counterintuitive. A more likely outcome is an 
+error in either the selection of relevant features, based on the correlation between the feature in 
+question and the output values, or in the implementation of the scoring values. 
 
 % Here we wrap up the analysis and actually discuss and draw conclusions. 
 % Also pull in other works and wonder on future improvements and further work
+\blindtext
 
 %\section{appendix}
 
@@ -420,7 +395,7 @@ back-propagation algorithms used.
 %body of the text. Also a potential place for code, though I imagine I will merely refer to
 %github for this. 
 
-\bibliography{bib.bib}
+%\bibliography{\string~/Documents/bibliography/Bibliography}
 
 \end{document}
 

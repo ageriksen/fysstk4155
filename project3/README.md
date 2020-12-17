@@ -1,9 +1,8 @@
 
 # project 3
 
-the nn uses an API called 'torchsample' which can be 
-downloaded with 
->	pip install git+https://github.com/ncullen93/torchsample
-I also had to install a separate module, [NiBabel](https://nipy.org/nibabel/)
->	pip install nibabel
+The code is split into 2 main scripts, 1 for logistic regression and 1 for
+neural network.  The 2 files can be found under the folder `scr`. The filenames
+are `logregcancer.py`and `ffnn.py`
 
+The report lies in the `report` folde, under the name `report.pdf`.
