@@ -11,28 +11,28 @@
 \usepackage[colorlinks=true,urlcolor=blue,citecolor=blue]{hyperref}
 \usepackage{color}
 \usepackage{physics}
-%\usepackage{algorithm2e}
-%\usepackage{algpseudocode}
-%\usepackage{pgfplots}
+\usepackage{algorithm2e}
+\usepackage{algpseudocode}
+\usepackage{pgfplots}
 \usepackage{pgfplotstable, booktabs, mathpazo}
-%\usepackage{natbib}
-%
+\usepackage{natbib}
+
 \pgfplotsset{compat=1.15}
 
-%\pgfplotstableset{
-%    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
-%    every last row/.style={after row=\hline \bottomrule},
-%    every first column/.style={
-%        column type/.add={|}{}
-%        },
-%    every last column/.style={
-%        column type/.add={}{|}
-%        },
-%}
-%\pgfplotstableset{
-%    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
-%    every last row/.style={after row=\hline \bottomrule}
-%}
+\pgfplotstableset{
+    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
+    every last row/.style={after row=\hline \bottomrule},
+    every first column/.style={
+        column type/.add={|}{}
+        },
+    every last column/.style={
+        column type/.add={}{|}
+        },
+}
+\pgfplotstableset{
+    every head row/.style={before row=\toprule \hline ,after row=\hline\hline \midrule},
+    every last row/.style={after row=\hline \bottomrule}
+}
 
 %\begin{figure}[hbtp]
 %\includegraphics[scale=0.4]{.pdf}
@@ -100,6 +100,7 @@ set accuracy starts to fall off.
 %insert the theory for logistic regression and ffnn, see lect. notes and the
 %relevant course literature mentioned there. 
 
+\subsection{Logistic Regression}
 The base problem to be solved with the cancer data set is a binary benign vs.
 malignant tumor, 0 or 1 encoded respectively, 
 
@@ -186,20 +187,155 @@ and compacting, gives us
 		- \mathbf{\hat{X}}^T (\hat{y} - \hat{p}).
 	\label{Cost1stDerivative}
 \end{align}
-Where $\hat{y}$ is a vector with the values $y_i$, $\mathbf{\hat{X}}$ is an $n\times p$ matrix containing 
-the $x_i$ values. The vector $\hat{p}$ contains the fitted probabilities $p(y_i|x_i,\hat{\beta})$. For 
-a step further and introducing another matrix, $\mathbf{\hat{W}}$ with elements 
-$p(y_i|x_i,\hat{\beta})(1 - p(y_i|x_i,\hat{\beta})$, we can arrive at a more compact version of the 
-2. derivative. 
+
+Where $\hat{y}$ is a vector with the values $y_i$, $\mathbf{\hat{X}}$ is an
+$n\times p$ matrix containing the $x_i$ values. The vector $\hat{p}$ contains
+the fitted probabilities $p(y_i|x_i,\hat{\beta})$. For a step further and
+introducing another matrix, $\mathbf{\hat{W}}$ with elements
+$p(y_i|x_i,\hat{\beta})(1 - p(y_i|x_i,\hat{\beta})$, we can arrive at a more
+compact version of the 2. derivative. 
 
 \begin{align}
 	\pdv[2]{\mathcal{C}(\hat{\beta})}{\hat{\beta}}{\hat{\beta}^T} 
 		= \mathbf{\hat{X}}^T \mathbf{\hat{W}} \mathbf{\hat{X}}
 	\label{Cost2ndDerivative}.
 \end{align}
-%TODO go through the implementation of the logreg script and explain the steps. then move on to nn. 
+
+With the regression model accounted for, the script itself imports and uses the
+\emph{scikitlearn} module in python, where the data is loaded from, scaled and
+split into training and testing sets in various permutations. The regression itself is
+mainly done with scikitlearn's \emph{LogisticRegression} method, implementing
+the mathematics above with a well documented and tested code. It is also
+optimized well beyond the possible approach of this project. It is therefore an
+easy to use tool to check the data. 
+
+Once the data set is loaded and some parts are displayed, 3 different
+regressions are made. 1 for the raw set, one where the feature data is scaled
+and one where a percentage of the most important features are selected for and
+trained on.
+
+\subsection{Feed Forward Neural Net}
+
+A neural network is a computational model which aims to imitate the workings of
+biological neurons, where an arbitrary amount of layers, each with an arbitrary
+number of neurons exchange signals in the form of mathematical functions. These
+systems take in example inputs and configures an output without any specific
+rules for a given task
+
+The basic idea is that each neuron collects incoming signals. If the signals exceed
+a given activation threshold, the neuron fires as well. the signals failing to meet this
+threshold leave the neuron inert and there is no signal. A simple mathematical model of this
+can be written,
+
+\begin{align}
+	\mathbf{y} = \mathbf{f}\qty(\sum_{i=1}^n \omega_i x_i) = \mathbf{f}(\mathbf{u})
+	\label{simpleNeuron}. 
+\end{align}
+
+Where the output $y$ is the output of the activation function and takes the
+input of a weighted sum of n other neurons. Though there are various types,
+e.g. Convolutional neural networks for image recognition, The focus for this
+will be a simple general purpose one for supervised learning, seeing as the
+cancer data is already properly labeled. 
+
+The model used in this project is a Feed forward Neural network. This is the
+first type developed and the simplest type. Here, the information flows only
+one way. Each node in a layer is connected to every other node in the next
+layer, mediated with weights. Therefore called a \emph{Fully Connected FFNN}
+
+A neural net with 3 or more layers, an input and output layer with one or more
+hidden layers between, is frequently called a \emph{Multilayer Perceptron
+(MLP)}. These are utilized because the \emph{universal approximation theorem}
+shows us that Given a non-constant, bounded and monotonically increasing
+activation function for the hidden layer.  Given a non-constant, bounded and
+monotonically increasing activation, an MLP can predict a continuous
+multidimensional function to arbitrary accuracy with only 1 hidden layer and a
+finite set of neurons.
+
+The output is then given by the function 
+
+\begin{align}
+	y = f\qty(\sum_{i=1}^n(w_ix_i + b_i)) = f(z)
+	\label{eq:activationFunc}.
+\end{align}
+
+This is similar to equation \ref{simpleNeuron}, but with an added intercept per
+node. The MLP is fully connected, as stated above. Thus each node receives a
+weighted sum of the output of every other node in the previous layer. 
+
+For the first hidden layer, each node $z^1_i$ is then a weighted sum of the
+outputs of the nodes int the input layer. 
+
+\begin{align}
+	z^1_i = \sum_{j=1}^N w^1_{ij}x_j + b_i^1
+	\label{eq:nodeInput}.
+\end{align}
+
+The $b^1_i$ is the bias for the node, which is needed in the case of a 0 input.
+The value of this sum is the input into the activation function, eq.
+\ref{eq:activationFunc}, for the i-th node. The summation is over all $N$
+possible inputs into the first layer.
+
+More generally, we can assume that the nodes within a layer share an activation function
+but that the activation functions could vary between layers. This can be shown with a superscript
+$l$.
+
+\begin{align}
+	y^l_i = f(z^l_i) = f\qty(\sum_{j=1}^{N_{l-1}}( w^l_{ij}x^l_i ) + b^l_i ).
+\end{align}
+
+Here, the $N_{l-1}$ denotes the number of nodes on the previous layer, as the
+$M$ in equation \ref{eq:nodeInput} denotes the number of nodes in the input
+layer. This process can be repeated through the layers, Feeding Forward to the
+output layer. This expression eventually becomes then a sum of the sum of the
+sums of the previous layers. In essence, then the only independent variables in
+the system is the initial values. The rest inductively follow. 
+
+With the input settled, the question of activation function comes next. As
+mentioned wrt. the universal approximation theorem , the activation function
+has a few requirements. The activation function must be non-constant, bounded,
+monotonically-increasing and continuous. The second option here excludes any linear
+function. In order to avoid the neural net producing a linear transformation through the layers, 
+some non-linearity is needed. A common activation function is the \emph{sigmoid function}
+
+\begin{align}
+	f(x) = \frac{1}{1 + \exp(-x)}
+	\label{eq:sigmoid}
+\end{align}
+
+There are many other options, but they are not explored with this project.
+There are some issues with the sigmoid function wrt. gradient descent methods
+as the gradients can tend to disappear for the sigmoid, despite it's initial
+popularity due to the similarity with the potential curves within the
+biological neurons. A more popular function is the $\tanh$ function. 
+
+With the layers and nodes described as well as the signal connecting them from input to 
+output, There remains an issue of predictive ability. Sending the data through and setting the weights 
+the once is not the best basis for such things. To improve the results, we can adjust the weights once
+we've found an output. The method for this is the \emph{back propagation algorithm}
+
+The back propagation error is
+\begin{align}
+	\delta^l_j = \sum_k \;\;\;\delta^{l+1}_k \;\; w^{l+1}_{kj} \;\; f'(z^l_j)
+\end{align}
+
+Which we apply once the layers have been passed through forward, using the outputs of each layer and
+propagating the errors backwards. Using gradient descent, we update the weights of each node according
+to the gradient and the learningrate. 
+
+%TODO describe neural nets
 
 \section{results}
+
+\begin{figure}[hbtp]
+\includegraphics[scale=.6]{../ffnnaccuracy.png}
+\caption{Plot of the accuracy of prediction of the neural net for the Wisconsin
+	cancer data set.  The accuracy is the ratio of accurate predictions over
+	the different epochs. The blue training accuracy quickly goes to ~0.99,
+	while the test sett accuracy peaks some 150 epochs later at ~0.97 before
+	lowering gradually after about 600 epochs.}
+\label{fig:ffnnaccuracy}
+\end{figure}
 
 % Here go the results of the tests, the display of the data (unless implemented in methods)
 % here goes the prediction results and the accuracy plots. 

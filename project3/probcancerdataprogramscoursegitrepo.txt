@@ -1,5 +1,0 @@
-ProjectsData/kerasbreast.py~
-ProjectsData/breast_NN.py~
-ProjectsData/kerasbreast.py
-ProjectsData/Project2_1.py
-JupyterFiles/Examples/Intro to ML Examples/Cancer.ipynb

@@ -1,0 +1,31 @@
+     mean radius  mean texture  ...  worst fractal dimension  target
+0          17.99         10.38  ...                  0.11890     0.0
+1          20.57         17.77  ...                  0.08902     0.0
+2          19.69         21.25  ...                  0.08758     0.0
+3          11.42         20.38  ...                  0.17300     0.0
+4          20.29         14.34  ...                  0.07678     0.0
+..           ...           ...  ...                      ...     ...
+564        21.56         22.39  ...                  0.07115     0.0
+565        20.13         28.25  ...                  0.06637     0.0
+566        16.60         28.08  ...                  0.07820     0.0
+567        20.60         29.33  ...                  0.12400     0.0
+568         7.76         24.54  ...                  0.07039     1.0
+ 
+[569 rows x 31 columns]
+(426, 30)
+(143, 30)
+test set accuracy with logreg: 0.96
+test set accuracy with logreg, scaled data: 0.98
+**********
+worst concave points    0.793566
+worst perimeter         0.782914
+mean concave points     0.776614
+worst radius            0.776454
+mean perimeter          0.742636
+worst area              0.733825
+mean radius             0.730029
+mean area               0.708984
+mean concavity          0.696360
+dtype: float64
+**********
+test accuracy, logreg, scaled data, important inputs: 0.95

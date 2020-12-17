@@ -26,9 +26,21 @@ cancer = load_breast_cancer()
 cdf = pd.DataFrame(np.c_[cancer.data, cancer.target], 
         columns=np.append(cancer.feature_names, ['target']) )
 
-display(cdf)
 ##################################################
 
+#Set up the nn class.
+class Net(torch.nn.Module):
+    def __init__(self, n_feature, n_hidden, n_output):
+        super(Net, self).__init__()
+        self.hidden = torch.nn.Linear(n_feature, n_hidden)#hiddenlayer
+        self.predict = torch.nn.Linear(n_hidden, n_output)#outputlayer
+        self.sigmoid = torch.nn.Sigmoid()
+
+    def forward(self, x):
+        x = F.relu(self.hidden(x))#activation for hidden layer
+        x = self.predict(x) #linear output
+        x = self.sigmoid(x)
+        return x
 
 X = torch.tensor(cancer.data, dtype=torch.float32)
 y = torch.tensor(cancer.target, dtype=torch.float32)
@@ -42,19 +54,6 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 X_train_scaled = torch.tensor(X_train_scaled, dtype=torch.float32)
 X_test_scaled = torch.tensor(X_test_scaled, dtype=torch.float32)
-
-class Net(torch.nn.Module):
-    def __init__(self, n_feature, n_hidden, n_output):
-        super(Net, self).__init__()
-        self.hidden = torch.nn.Linear(n_feature, n_hidden)#hiddenlayer
-        self.predict = torch.nn.Linear(n_hidden, n_output)#outputlayer
-        self.sigmoid = torch.nn.Sigmoid()
-
-    def forward(self, x):
-        x = F.relu(self.hidden(x))#activation for hidden layer
-        x = self.predict(x) #linear output
-        x = self.sigmoid(x)
-        return x
 
 net = Net(n_feature=len(cancer.feature_names), n_hidden=10, n_output=1)
 
@@ -92,6 +91,10 @@ for t in range(epochs):
 accuracy_train = accuracy_train[:stop]
 accuracy_test = accuracy_test[:stop]
 
-plt.plot(accuracy_train)
-plt.plot(accuracy_test)
+plt.plot(accuracy_train, label='train')
+plt.plot(accuracy_test, label='test')
+plt.legend()
+plt.xlabel('epochs')
+plt.ylabel('accuracy')
+plt.title('ffnn prediction of benign/malignant tumor')
 plt.show()
