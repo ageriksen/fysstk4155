@@ -60,10 +60,13 @@
 \maketitle
 
 \begin{abstract}
-	The wisconsin cancer data is a staple of machine learning and should therefore 
-	be a good point to analyse different methods. I analyze the data using 2 different 
-	methods, firstly through logistic regression and later on using a Feed Forward Neural
-	Network 
+	The project uses the Wisconsin breast cancer dataset and explores 2
+	different machine learning methods to analyse it. The logistic regression
+	sof classifier and the Multilayer Perceptron or Feed-Forward Neural
+	network. The neural net has 1 hidden layer and uses the sigmoid activation
+	function.  Both methods predict the outcomes in the upper 90\% of cases,
+	while the logistic regression seems to have a minimal advantage for this
+	data set.
 \end{abstract}
 
 \section{introduction}
@@ -73,12 +76,12 @@ problems, and offers a good starting point to compare implementations of
 machine learning methods. I have put the set through 2 different methods,
 Logistic regression and a Feed Forward Neural Network. 
 
-First, the Logistic regression takes in the data and feeds it into the
-sklearn logistic regression method.  This is done without- and then with
-scaling the data to see prediction accuracy depending on these. Then I take
-only those features with the greatest correlation to a malignant tumour and
-train the set on those only, to see the predictive ability of the methods
-based on these. 
+First, the Logistic regression takes in the data and feeds it into the sklearn
+logistic regression method.  This is done without- and then with scaling the
+data to see prediction accuracy of the 2 states of the data. Then I take only
+those features with the greatest correlation to a malignant tumour and train
+the set on those only, to see the predictive ability of the methods. The gist
+her is an attempt to reduce noise in the data set.
 
 While we see an expected increase in accuracy after normalising the features,
 there is a rather unexpected decrease in accuracy when only including the more
@@ -383,6 +386,12 @@ falters. The 2 accuracies can be seen in figure \ref{fig:ffnnaccuracy}
 % Also discuss, though do no conclude the results. 
 
 \section{conclusion}
+
+The logistic regression method set the system up to progressively remove noise in 
+the data set to select those features who were the mos important to the prediction
+of whether the tumor was benign or malignant. The neural net Focused mainly on setting
+and training the net over epochs and noting whether or not the accuracy of the predictions
+on the test set had crested it's peak and was predicting worse. 
 
 The results from the logistic regression points towards predicting based on all
 features rather than stripping away the less relevant features. This seems
